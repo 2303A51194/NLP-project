@@ -1,0 +1,5 @@
+Patients often face difficulties in evaluating hospital service quality due to the large volume of unstructured feedback and reviews.
+Traditional methods of analyzing patient feedback are time-consuming and may not identify important service issues effectively.
+There is a need for an NLP-based system to automatically analyze patient reviews and identify sentiments, complaints, and service-quality factors.
+The system can analyze aspects such as doctor behavior, staff support, waiting time, cleanliness, facilities, and overall satisfaction in hospitals across Warangal.
+This project aims to develop an NLP-based hospital service quality analysis system that provides actionable insights to improve patient experience and healthcare services.

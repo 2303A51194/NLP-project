@@ -1,0 +1,785 @@
+# ============================================================
+# NLP-BASED HOSPITAL SERVICE QUALITY ANALYSIS IN WARANGAL
+# COMPLETE PYTHON / GOOGLE COLAB CODE
+# ============================================================
+
+import pandas as pd
+import numpy as np
+import re
+import string
+import matplotlib.pyplot as plt
+from collections import Counter
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report, accuracy_score
+from sklearn.linear_model import LogisticRegression
+
+from google.colab import files
+
+# ============================================================
+# 1. UPLOAD DATASET
+# ============================================================
+
+uploaded = files.upload()
+
+file_name = list(uploaded.keys())[0]
+
+df = pd.read_csv(file_name)
+
+print("Dataset loaded successfully")
+print("Dataset shape:", df.shape)
+
+display(df.head())
+
+
+# ============================================================
+# 2. BASIC DATASET INFORMATION
+# ============================================================
+
+print("\nDataset Information")
+print("=" * 60)
+
+print("Rows:", df.shape[0])
+print("Columns:", df.shape[1])
+
+print("\nColumn Names:")
+print(df.columns.tolist())
+
+print("\nData Types:")
+print(df.dtypes)
+
+print("\nMissing Values:")
+print(df.isnull().sum())
+
+
+# ============================================================
+# 3. REMOVE DUPLICATES
+# ============================================================
+
+before = len(df)
+
+df = df.drop_duplicates().copy()
+
+after = len(df)
+
+print("\nDuplicate Removal")
+print("=" * 60)
+print("Rows before:", before)
+print("Rows after:", after)
+print("Duplicates removed:", before - after)
+
+
+# ============================================================
+# 4. HANDLE MISSING FEEDBACK
+# ============================================================
+
+df["feedback_text"] = df["feedback_text"].fillna("").astype(str)
+
+print("\nMissing feedback after cleaning:")
+print(df["feedback_text"].isnull().sum())
+
+
+# ============================================================
+# 5. NLP STOPWORDS
+# ============================================================
+
+stop_words = set("""
+a an the and or but if then than so because as of at by for from in into on onto
+to with about after before during through over under again further once here there
+all any both each few more most other some such no nor not only own same too very
+can will just should now is am are was were be been being have has had do does did
+this that these those it its he him his she her hers they them their theirs we us
+our ours you your yours i me my mine
+""".split())
+
+
+# ============================================================
+# 6. NLP CLEANING FUNCTION
+# ============================================================
+
+def clean_text(text):
+
+    text = text.lower()
+
+    text = re.sub(r"http\S+|www\S+", " ", text)
+
+    text = re.sub(r"\S+@\S+", " ", text)
+
+    text = re.sub(r"\d+", " ", text)
+
+    text = text.translate(
+        str.maketrans("", "", string.punctuation)
+    )
+
+    text = re.sub(r"\s+", " ", text).strip()
+
+    tokens = text.split()
+
+    tokens = [
+        word
+        for word in tokens
+        if word not in stop_words and len(word) > 2
+    ]
+
+    cleaned_words = []
+
+    for word in tokens:
+
+        if word.endswith("ies") and len(word) > 4:
+            word = word[:-3] + "y"
+
+        elif word.endswith("ing") and len(word) > 5:
+            word = word[:-3]
+
+        elif word.endswith("ed") and len(word) > 4:
+            word = word[:-2]
+
+        elif word.endswith("es") and len(word) > 4:
+            word = word[:-2]
+
+        elif word.endswith("s") and len(word) > 3:
+            word = word[:-1]
+
+        cleaned_words.append(word)
+
+    return " ".join(cleaned_words)
+
+
+# ============================================================
+# 7. CREATE CLEANED TEXT
+# ============================================================
+
+df["cleaned_feedback"] = df["feedback_text"].apply(clean_text)
+
+print("\nOriginal vs Cleaned Feedback")
+print("=" * 60)
+
+display(
+    df[
+        [
+            "feedback_text",
+            "cleaned_feedback"
+        ]
+    ].head(20)
+)
+
+
+# ============================================================
+# 8. TOKENIZATION
+# ============================================================
+
+df["tokens"] = df["cleaned_feedback"].apply(
+    lambda x: x.split()
+)
+
+df["cleaned_word_count"] = df["tokens"].apply(len)
+
+print("\nTokenized Feedback")
+print("=" * 60)
+
+display(
+    df[
+        [
+            "feedback_text",
+            "cleaned_feedback",
+            "tokens",
+            "cleaned_word_count"
+        ]
+    ].head(10)
+)
+
+
+# ============================================================
+# 9. WORD FREQUENCY ANALYSIS
+# ============================================================
+
+all_words = []
+
+for tokens in df["tokens"]:
+    all_words.extend(tokens)
+
+word_frequency = Counter(all_words)
+
+word_frequency_df = pd.DataFrame(
+    word_frequency.most_common(30),
+    columns=["Word", "Frequency"]
+)
+
+print("\nTop 30 Most Frequent Words")
+print("=" * 60)
+
+display(word_frequency_df)
+
+
+# ============================================================
+# 10. WORD FREQUENCY GRAPH
+# ============================================================
+
+plt.figure(figsize=(12, 6))
+
+plt.bar(
+    word_frequency_df["Word"],
+    word_frequency_df["Frequency"]
+)
+
+plt.xticks(rotation=60)
+plt.xlabel("Words")
+plt.ylabel("Frequency")
+plt.title("Top 30 Most Frequent Words")
+
+plt.tight_layout()
+plt.show()
+
+
+# ============================================================
+# 11. TF-IDF
+# ============================================================
+
+tfidf = TfidfVectorizer(
+    max_features=5000,
+    ngram_range=(1, 2),
+    min_df=2
+)
+
+tfidf_matrix = tfidf.fit_transform(
+    df["cleaned_feedback"]
+)
+
+print("\nTF-IDF Matrix")
+print("=" * 60)
+
+print("Number of documents:", tfidf_matrix.shape[0])
+print("Number of features:", tfidf_matrix.shape[1])
+
+
+# ============================================================
+# 12. DISPLAY TF-IDF FEATURES
+# ============================================================
+
+features = tfidf.get_feature_names_out()
+
+tfidf_sample = pd.DataFrame(
+    tfidf_matrix[:10].toarray(),
+    columns=features
+)
+
+print("\nTF-IDF Sample")
+display(tfidf_sample.iloc[:, :30])
+
+
+# ============================================================
+# 13. SENTIMENT DISTRIBUTION
+# ============================================================
+
+print("\nSentiment Distribution")
+print("=" * 60)
+
+sentiment_counts = df["sentiment_label"].value_counts()
+
+display(sentiment_counts)
+
+
+# ============================================================
+# 14. SENTIMENT GRAPH
+# ============================================================
+
+plt.figure(figsize=(8, 5))
+
+sentiment_counts.plot(kind="bar")
+
+plt.xlabel("Sentiment")
+plt.ylabel("Number of Reviews")
+plt.title("Hospital Feedback Sentiment Distribution")
+
+plt.xticks(rotation=0)
+
+plt.tight_layout()
+plt.show()
+
+
+# ============================================================
+# 15. SENTIMENT PERCENTAGE
+# ============================================================
+
+sentiment_percentage = (
+    df["sentiment_label"]
+    .value_counts(normalize=True)
+    .mul(100)
+    .round(2)
+)
+
+print("\nSentiment Percentage")
+print("=" * 60)
+
+display(sentiment_percentage)
+
+
+# ============================================================
+# 16. PRIMARY ISSUE ANALYSIS
+# ============================================================
+
+print("\nPrimary Hospital Issues")
+print("=" * 60)
+
+issue_counts = df["primary_issue"].value_counts()
+
+display(issue_counts)
+
+
+# ============================================================
+# 17. PRIMARY ISSUE GRAPH
+# ============================================================
+
+plt.figure(figsize=(12, 6))
+
+issue_counts.head(15).plot(kind="bar")
+
+plt.xlabel("Primary Issue")
+plt.ylabel("Number of Feedback Records")
+plt.title("Major Hospital Service Issues")
+
+plt.xticks(rotation=60)
+
+plt.tight_layout()
+plt.show()
+
+
+# ============================================================
+# 18. HOSPITAL-WISE FEEDBACK
+# ============================================================
+
+hospital_counts = (
+    df["hospital_name"]
+    .value_counts()
+)
+
+print("\nHospital-wise Feedback Count")
+print("=" * 60)
+
+display(hospital_counts)
+
+
+# ============================================================
+# 19. HOSPITAL-WISE SENTIMENT
+# ============================================================
+
+hospital_sentiment = pd.crosstab(
+    df["hospital_name"],
+    df["sentiment_label"]
+)
+
+print("\nHospital-wise Sentiment")
+print("=" * 60)
+
+display(hospital_sentiment)
+
+
+# ============================================================
+# 20. HOSPITAL-WISE SATISFACTION
+# ============================================================
+
+hospital_satisfaction = (
+    df.groupby("hospital_name")[
+        "overall_satisfaction_score"
+    ]
+    .mean()
+    .sort_values(ascending=False)
+)
+
+print("\nHospital-wise Average Satisfaction")
+print("=" * 60)
+
+display(
+    hospital_satisfaction.to_frame(
+        "Average Satisfaction"
+    )
+)
+
+
+# ============================================================
+# 21. HOSPITAL SATISFACTION GRAPH
+# ============================================================
+
+plt.figure(figsize=(13, 7))
+
+hospital_satisfaction.plot(kind="bar")
+
+plt.xlabel("Hospital")
+plt.ylabel("Average Satisfaction Score")
+plt.title("Hospital-wise Average Satisfaction")
+
+plt.xticks(rotation=70)
+
+plt.tight_layout()
+plt.show()
+
+
+# ============================================================
+# 22. WAITING TIME ANALYSIS
+# ============================================================
+
+print("\nWaiting Time Statistics")
+print("=" * 60)
+
+print(
+    df["waiting_time_min"].describe()
+)
+
+
+# ============================================================
+# 23. WAITING TIME VS SATISFACTION
+# ============================================================
+
+plt.figure(figsize=(10, 6))
+
+plt.scatter(
+    df["waiting_time_min"],
+    df["overall_satisfaction_score"],
+    alpha=0.3
+)
+
+plt.xlabel("Waiting Time (minutes)")
+plt.ylabel("Overall Satisfaction Score")
+plt.title("Waiting Time vs Patient Satisfaction")
+
+plt.tight_layout()
+plt.show()
+
+
+# ============================================================
+# 24. COMPLAINT ANALYSIS
+# ============================================================
+
+print("\nComplaint Registration")
+print("=" * 60)
+
+complaint_counts = (
+    df["complaint_registered"]
+    .value_counts()
+)
+
+display(complaint_counts)
+
+
+# ============================================================
+# 25. COMPLAINT RESOLUTION
+# ============================================================
+
+print("\nComplaint Resolution")
+print("=" * 60)
+
+resolution_counts = (
+    df["complaint_resolved"]
+    .value_counts()
+)
+
+display(resolution_counts)
+
+
+# ============================================================
+# 26. RECOMMENDATION ANALYSIS
+# ============================================================
+
+print("\nWould Patients Recommend Hospital?")
+print("=" * 60)
+
+recommend_counts = (
+    df["recommend_hospital"]
+    .value_counts()
+)
+
+display(recommend_counts)
+
+
+# ============================================================
+# 27. SERVICE QUALITY INDEX
+# ============================================================
+
+print("\nService Quality Index Statistics")
+print("=" * 60)
+
+print(
+    df["service_quality_index"].describe()
+)
+
+
+# ============================================================
+# 28. TOP POSITIVE REVIEWS
+# ============================================================
+
+print("\nPositive Feedback Examples")
+print("=" * 60)
+
+positive_reviews = df[
+    df["sentiment_label"]
+    .astype(str)
+    .str.lower()
+    .str.contains("positive")
+]
+
+display(
+    positive_reviews[
+        [
+            "hospital_name",
+            "department",
+            "feedback_text",
+            "overall_satisfaction_score",
+            "star_rating"
+        ]
+    ].head(10)
+)
+
+
+# ============================================================
+# 29. TOP NEGATIVE REVIEWS
+# ============================================================
+
+print("\nNegative Feedback Examples")
+print("=" * 60)
+
+negative_reviews = df[
+    df["sentiment_label"]
+    .astype(str)
+    .str.lower()
+    .str.contains("negative")
+]
+
+display(
+    negative_reviews[
+        [
+            "hospital_name",
+            "department",
+            "feedback_text",
+            "overall_satisfaction_score",
+            "star_rating"
+        ]
+    ].head(10)
+)
+
+
+# ============================================================
+# 30. NLP SENTIMENT CLASSIFICATION USING TF-IDF
+# ============================================================
+
+model_df = df[
+    df["cleaned_feedback"].str.strip() != ""
+].copy()
+
+model_df = model_df[
+    model_df["sentiment_label"].notna()
+].copy()
+
+X = model_df["cleaned_feedback"]
+
+y = model_df["sentiment_label"].astype(str)
+
+
+# ============================================================
+# 31. TRAIN TEST SPLIT
+# ============================================================
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.20,
+    random_state=42,
+    stratify=y
+)
+
+
+# ============================================================
+# 32. TF-IDF FOR MACHINE LEARNING
+# ============================================================
+
+model_tfidf = TfidfVectorizer(
+    max_features=10000,
+    ngram_range=(1, 2),
+    min_df=2
+)
+
+X_train_tfidf = model_tfidf.fit_transform(X_train)
+
+X_test_tfidf = model_tfidf.transform(X_test)
+
+
+# ============================================================
+# 33. LOGISTIC REGRESSION MODEL
+# ============================================================
+
+model = LogisticRegression(
+    max_iter=1000
+)
+
+model.fit(
+    X_train_tfidf,
+    y_train
+)
+
+
+# ============================================================
+# 34. PREDICTIONS
+# ============================================================
+
+y_pred = model.predict(
+    X_test_tfidf
+)
+
+
+# ============================================================
+# 35. MODEL ACCURACY
+# ============================================================
+
+accuracy = accuracy_score(
+    y_test,
+    y_pred
+)
+
+print("\nSentiment Classification Accuracy")
+print("=" * 60)
+
+print(
+    "Accuracy:",
+    round(accuracy * 100, 2),
+    "%"
+)
+
+
+# ============================================================
+# 36. CLASSIFICATION REPORT
+# ============================================================
+
+print("\nClassification Report")
+print("=" * 60)
+
+print(
+    classification_report(
+        y_test,
+        y_pred
+    )
+)
+
+
+# ============================================================
+# 37. PREDICT NEW PATIENT FEEDBACK
+# ============================================================
+
+new_reviews = [
+    "The doctor was very helpful and staff were polite",
+    "Waiting time was very long and billing was confusing",
+    "Hospital was clean and service was excellent",
+    "The staff were rude and the waiting time was terrible"
+]
+
+new_reviews_cleaned = [
+    clean_text(review)
+    for review in new_reviews
+]
+
+new_reviews_tfidf = model_tfidf.transform(
+    new_reviews_cleaned
+)
+
+predictions = model.predict(
+    new_reviews_tfidf
+)
+
+prediction_df = pd.DataFrame({
+    "Original Feedback": new_reviews,
+    "Cleaned Feedback": new_reviews_cleaned,
+    "Predicted Sentiment": predictions
+})
+
+print("\nNew Patient Feedback Prediction")
+print("=" * 60)
+
+display(prediction_df)
+
+
+# ============================================================
+# 38. FINAL CLEANED DATASET
+# ============================================================
+
+final_columns = [
+    "feedback_id",
+    "visit_date",
+    "hospital_name",
+    "department",
+    "patient_age_group",
+    "gender",
+    "service_channel",
+    "preferred_language",
+    "visit_type",
+    "waiting_time_min",
+    "doctor_service_score",
+    "nursing_service_score",
+    "staff_behavior_score",
+    "communication_score",
+    "cleanliness_score",
+    "facility_score",
+    "overall_satisfaction_score",
+    "star_rating",
+    "sentiment_label",
+    "sentiment_strength",
+    "primary_issue",
+    "complaint_registered",
+    "complaint_resolved",
+    "recommend_hospital",
+    "feedback_text",
+    "cleaned_feedback",
+    "tokens",
+    "cleaned_word_count",
+    "urgency_level",
+    "service_quality_index",
+    "response_required"
+]
+
+final_columns = [
+    col for col in final_columns
+    if col in df.columns
+]
+
+cleaned_df = df[final_columns].copy()
+
+
+# ============================================================
+# 39. SAVE CLEANED DATASET
+# ============================================================
+
+output_file = "warangal_hospital_service_quality_cleaned.csv"
+
+cleaned_df.to_csv(
+    output_file,
+    index=False
+)
+
+print("\nCleaned Dataset Saved")
+print("=" * 60)
+
+print("File:", output_file)
+print("Rows:", cleaned_df.shape[0])
+print("Columns:", cleaned_df.shape[1])
+
+
+# ============================================================
+# 40. SHOW FINAL CLEANED DATASET
+# ============================================================
+
+print("\nFINAL CLEANED DATASET")
+print("=" * 60)
+
+display(
+    cleaned_df.head(20)
+)
+
+
+# ============================================================
+# 41. DOWNLOAD CLEANED DATASET
+# ============================================================
+
+files.download(
+    output_file
+)
+
+print("\nDONE")
+print("Your cleaned NLP dataset has been downloaded.")

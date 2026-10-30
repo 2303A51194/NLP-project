@@ -1,0 +1,15 @@
+Original CSV (100,000 records)
+↓
+Data Cleaning
+↓
+Text Preprocessing
+↓
+Tokenization
+↓
+Stopword Removal
+↓
+Lemmatization
+↓
+Cleaned Dataset
+↓
+TF-IDF / Sentiment Analysis / Classification
