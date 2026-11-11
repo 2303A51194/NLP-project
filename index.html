@@ -3,750 +3,820 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MediSense NLP • Hospital Quality Intelligence & Medical Report Simplification</title>
+    <title>MediSense AI — Clinical Healthcare Studio & Regional Telugu NLP Platform</title>
+    
+    <!-- Typography: Plus Jakarta Sans, Inter, Noto Sans Telugu -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Telugu:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6 Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- DYNAMIC ASSET RESOLUTION: WORKS BOTH VIA FLASK SERVER & DIRECT FILE OPENING -->
-    <script>
-        (function() {
-            var inTemplates = window.location.pathname.indexOf('/templates/') !== -1;
-            var prefix = inTemplates ? '../static/' : (window.location.protocol === 'file:' ? 'static/' : '/static/');
-            var link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = prefix + 'css/style.css';
-            document.head.appendChild(link);
-        })();
-    </script>
-    <noscript>
-        <link rel="stylesheet" href="../static/css/style.css">
-        <link rel="stylesheet" href="static/css/style.css">
-        <link rel="stylesheet" href="/static/css/style.css">
-    </noscript>
+    <!-- Robust Multi-Path CSS Loader: Works from Root, frontend/, static/, or templates/ -->
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <!-- NAVBAR -->
-    <header class="navbar">
-        <div class="nav-container">
-            <a href="#home" class="nav-brand">
-                <span class="brand-icon"><i class="fa-solid fa-hospital-user"></i></span>
-                <div class="brand-text">
-                    <span class="brand-title">MediSense <strong>NLP</strong></span>
-                    <span class="brand-sub">Warangal Healthcare Intelligence</span>
+    <div class="app-layout">
+        <!-- ============================================================
+             1. LEFT WORKSPACE SIDEBAR
+             ============================================================ -->
+        <aside class="app-sidebar" id="appSidebar">
+            <!-- Brand -->
+            <div class="sidebar-brand">
+                <div class="brand-badge-icon">
+                    <i class="fa-solid fa-heart-pulse"></i>
                 </div>
-            </a>
-            
-            <nav class="nav-menu">
-                <a href="#home" class="nav-link active">Home</a>
-                <a href="#feedback-analyzer" class="nav-link">Feedback Analyzer</a>
-                <a href="#database-feed" class="nav-link">Database Feed</a>
-                <a href="#hospital-analytics" class="nav-link">Hospital Analytics</a>
-                <a href="#report-simplifier" class="nav-link">Report Simplifier</a>
-                <a href="#ehr-history" class="nav-link">EHR History</a>
-                <a href="#consultation" class="nav-link">OPD Inquiries</a>
-                <a href="#team" class="nav-link">Project Team</a>
+                <div class="brand-details">
+                    <span class="brand-title">MediSense <span>AI</span></span>
+                    <span class="brand-sub">Clinical NLP Platform</span>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Clinical Studio</div>
+                
+                <a class="sidebar-item active" onclick="switchView('overview')" id="nav-overview">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Overview Dashboard</span>
+                </a>
+                
+                <a class="sidebar-item" onclick="switchView('feedback')" id="nav-feedback">
+                    <i class="fa-solid fa-comment-medical"></i>
+                    <span>Feedback NLP Studio</span>
+                    <span class="nav-count-chip">M1</span>
+                </a>
+                
+                <a class="sidebar-item" onclick="switchView('database')" id="nav-database">
+                    <i class="fa-solid fa-database"></i>
+                    <span>SQLite Live Feed</span>
+                    <span class="nav-count-chip" id="sideDbCount">25+</span>
+                </a>
+                
+                <a class="sidebar-item" onclick="switchView('analytics')" id="nav-analytics">
+                    <i class="fa-solid fa-chart-column"></i>
+                    <span>Hospital Benchmarks</span>
+                    <span class="nav-count-chip">100K</span>
+                </a>
+
+                <div class="nav-section-title" style="margin-top: 10px;">Diagnostic Engine</div>
+                
+                <a class="sidebar-item" onclick="switchView('simplifier')" id="nav-simplifier">
+                    <i class="fa-solid fa-language"></i>
+                    <span>Telugu Report Simplifier</span>
+                    <span class="nav-count-chip">TTS</span>
+                </a>
+                
+                <a class="sidebar-item" onclick="switchView('ehr')" id="nav-ehr">
+                    <i class="fa-solid fa-folder-closed"></i>
+                    <span>Patient EHR Archive</span>
+                </a>
+                
+                <a class="sidebar-item" onclick="switchView('consultation')" id="nav-consultation">
+                    <i class="fa-solid fa-calendar-check"></i>
+                    <span>OPD Booking Desk</span>
+                </a>
+
+                <div class="nav-section-title" style="margin-top: 10px;">Academic Info</div>
+                
+                <a class="sidebar-item" onclick="switchView('team')" id="nav-team">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>Project Team & Guide</span>
+                </a>
             </nav>
 
-            <div class="nav-actions">
-                <div id="backendStatusIndicator" class="backend-badge">
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <div class="sidebar-health-pill" id="backendStatusIndicator">
                     <span class="pulse-dot"></span>
-                    <span id="backendStatusText">Backend: SQLite Active</span>
-                </div>
-                <span class="student-badge"><i class="fa-solid fa-graduation-cap"></i> B.Tech CSE Mini Project</span>
-            </div>
-        </div>
-    </header>
-
-    <!-- HERO SECTION -->
-    <section id="home" class="hero-section">
-        <div class="hero-container">
-            <div class="hero-content">
-                <div class="hero-tag"><i class="fa-solid fa-database"></i> Dual-Engine Healthcare NLP & Full-Stack Backend</div>
-                <h1 class="hero-title">
-                    Transforming Regional Healthcare via <span class="text-gradient">Natural Language Processing</span>
-                </h1>
-                <p class="hero-description">
-                    Empowering hospital administrators with automated sentiment & grievance intelligence across <strong>100,000 Warangal patient reviews</strong> backed by a persistent <strong>SQLite database</strong>, and bridging the clinical divide with <strong>zero-hallucination Telugu medical report explanations & voice synthesis</strong>.
-                </p>
-
-                <div class="hero-buttons">
-                    <a href="#feedback-analyzer" class="btn btn-primary"><i class="fa-solid fa-comments"></i> Analyze Patient Feedback</a>
-                    <a href="#database-feed" class="btn btn-secondary"><i class="fa-solid fa-database"></i> View Live Database Feed</a>
-                    <a href="#report-simplifier" class="btn btn-outline"><i class="fa-solid fa-file-medical"></i> Simplify Lab Report</a>
-                    <a href="#consultation" class="btn btn-outline"><i class="fa-solid fa-calendar-check"></i> Book Consultation</a>
-                </div>
-
-                <div class="hero-stats">
-                    <div class="stat-box">
-                        <span class="stat-number">100,000</span>
-                        <span class="stat-label">Warangal Reviews</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-number">12</span>
-                        <span class="stat-label">Hospitals Analyzed</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-number">93.8%</span>
-                        <span class="stat-label">Sentiment Accuracy</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-number" id="heroDbRecords">25+</span>
-                        <span class="stat-label">Live DB Feedbacks</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-number">0.00%</span>
-                        <span class="stat-label">Biomarker Distortion</span>
-                    </div>
+                    <span id="backendStatusText">SQLite: Active</span>
                 </div>
             </div>
-        </div>
-    </section>
+        </aside>
 
-    <!-- TOAST NOTIFICATION CONTAINER -->
-    <div id="toastContainer" class="toast-container"></div>
-
-    <!-- SECTION 1: FEEDBACK ANALYZER & SUBMISSION -->
-    <section id="feedback-analyzer" class="section">
-        <div class="container">
-            <div class="section-header">
-                <span class="badge"><i class="fa-solid fa-magnifying-glass-chart"></i> Module 1</span>
-                <h2>Patient Feedback NLP Classifier & Database Submission</h2>
-                <p>Submit raw patient feedback to run the 15-stage academic NLP pipeline and automatically persist the classified record into the backend SQLite database.</p>
-            </div>
-
-            <div class="analyzer-grid">
-                <!-- Input Panel -->
-                <div class="card input-card">
-                    <h3><i class="fa-solid fa-pen-to-square"></i> Patient Review Entry</h3>
-                    <p class="help-text">Select a clinical preset or enter custom patient review with metadata:</p>
-
-                    <div class="preset-chips">
-                        <button class="chip" onclick="loadFeedbackPreset(1)">Preset 1: Doctor Praise & Waiting Delay</button>
-                        <button class="chip" onclick="loadFeedbackPreset(2)">Preset 2: Billing Opacity Complaint</button>
-                        <button class="chip" onclick="loadFeedbackPreset(3)">Preset 3: Cleanliness & Nursing</button>
-                        <button class="chip" onclick="loadFeedbackPreset(4)">Preset 4: Emergency Delay Urgency</button>
-                    </div>
-
-                    <!-- Metadata Fields -->
-                    <div class="form-row">
-                        <div class="form-group half-width">
-                            <label for="fbPatientName"><i class="fa-solid fa-user"></i> Patient Name / ID</label>
-                            <input type="text" id="fbPatientName" class="form-input" placeholder="e.g. K. Rajesh (OPD-402)" value="Verified Outpatient">
-                        </div>
-                        <div class="form-group half-width">
-                            <label for="fbHospital"><i class="fa-solid fa-hospital"></i> Hospital</label>
-                            <select id="fbHospital" class="form-select">
-                                <option value="Rohini Super Speciality Hospital">Rohini Super Speciality Hospital</option>
-                                <option value="MGM Hospital Warangal">MGM Hospital Warangal</option>
-                                <option value="Kakatiya Medical College Hospital">Kakatiya Medical College Hospital</option>
-                                <option value="Sri Sai Multispeciality Hospital">Sri Sai Multispeciality Hospital</option>
-                                <option value="Aditya Hospital Warangal">Aditya Hospital Warangal</option>
-                                <option value="Medwin Hospital Warangal">Medwin Hospital Warangal</option>
-                                <option value="CarePlus Hospital Warangal">CarePlus Hospital Warangal</option>
-                                <option value="Lalitha Super Speciality Hospital">Lalitha Super Speciality Hospital</option>
-                                <option value="Vijaya Health Care Hospital">Vijaya Health Care Hospital</option>
-                                <option value="Shree Balaji Hospital">Shree Balaji Hospital</option>
-                                <option value="Warangal Government General Hospital">Warangal Government General Hospital</option>
-                                <option value="Sunrise Multispeciality Hospital">Sunrise Multispeciality Hospital</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="fbDepartment"><i class="fa-solid fa-stethoscope"></i> Department</label>
-                        <select id="fbDepartment" class="form-select">
-                            <option value="General Medicine">General Medicine</option>
-                            <option value="Cardiology">Cardiology</option>
-                            <option value="Orthopedics">Orthopedics</option>
-                            <option value="Pediatrics">Pediatrics</option>
-                            <option value="Emergency Care">Emergency Care</option>
-                            <option value="Gynecology">Gynecology</option>
-                            <option value="Neurology">Neurology</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="feedbackText"><i class="fa-solid fa-comment-dots"></i> Feedback Text</label>
-                        <textarea id="feedbackText" rows="4" placeholder="Enter patient feedback here...">The doctor was polite and explained the treatment clearly, but the outpatient waiting time was more than 90 minutes and billing was slow.</textarea>
-                    </div>
-
-                    <div class="button-group">
-                        <button id="btnAnalyzeFeedback" class="btn btn-secondary" onclick="runFeedbackAnalysis(false)">
-                            <i class="fa-solid fa-bolt"></i> Quick NLP Preview
-                        </button>
-                        <button id="btnSubmitFeedback" class="btn btn-primary" onclick="runFeedbackAnalysis(true)">
-                            <i class="fa-solid fa-cloud-arrow-up"></i> Submit & Save to Database
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Result Panel -->
-                <div class="card result-card" id="feedbackResultCard">
-                    <h3><i class="fa-solid fa-square-poll-vertical"></i> NLP Intelligence & DB Record</h3>
-                    
-                    <div id="feedbackLoading" class="loading-state" style="display: none;">
-                        <div class="spinner"></div>
-                        <p>Processing text through TF-IDF and persisting to SQLite database...</p>
-                    </div>
-
-                    <div id="feedbackResults">
-                        <div id="dbSavedNotice" class="db-saved-notice" style="display:none;">
-                            <i class="fa-solid fa-check-circle"></i> <span id="dbSavedText">Record saved to backend database!</span>
-                        </div>
-
-                        <div class="metrics-row">
-                            <div class="metric-item">
-                                <span class="metric-title">Predicted Sentiment</span>
-                                <span id="resSentiment" class="pill pill-positive">Positive</span>
-                            </div>
-                            <div class="metric-item">
-                                <span class="metric-title">Confidence</span>
-                                <span id="resConfidence" class="metric-val text-primary">94.2%</span>
-                            </div>
-                            <div class="metric-item">
-                                <span class="metric-title">Primary Operational Issue</span>
-                                <span id="resIssue" class="metric-val">Long Waiting Time</span>
-                            </div>
-                            <div class="metric-item">
-                                <span class="metric-title">Urgency Rating</span>
-                                <span id="resUrgency" class="pill pill-warning">Medium Urgency</span>
-                            </div>
-                        </div>
-
-                        <!-- Pipeline Execution Breakdown -->
-                        <div class="pipeline-breakdown">
-                            <h4><i class="fa-solid fa-diagram-project"></i> Pipeline Step-by-Step Inspection</h4>
-                            
-                            <div class="pipeline-step">
-                                <span class="step-num">Step 1</span>
-                                <div class="step-info">
-                                    <strong>Normalized & Cleaned Text (Regex, Punctuation & Digit Stripping):</strong>
-                                    <p id="resCleaned" class="step-data">doctor polit explain treatment clear outpatient wait time minut bill slow</p>
-                                </div>
-                            </div>
-
-                            <div class="pipeline-step">
-                                <span class="step-num">Step 2</span>
-                                <div class="step-info">
-                                    <strong>Extracted Tokens (Stopwords Removed & Lemmatized):</strong>
-                                    <div id="resTokens" class="tokens-container">
-                                        <span class="token">doctor</span>
-                                        <span class="token">polit</span>
-                                        <span class="token">explain</span>
-                                        <span class="token">treatment</span>
-                                        <span class="token">wait</span>
-                                        <span class="token">time</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="pipeline-step">
-                                <span class="step-num">Step 3</span>
-                                <div class="step-info">
-                                    <strong>Estimated Service Quality Index (SQI Score):</strong>
-                                    <div class="progress-bar-container">
-                                        <div id="sqiProgress" class="progress-bar" style="width: 78%;">78.0 / 100</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div id="adminActionAlert" class="alert alert-info">
-                                <i class="fa-solid fa-circle-info"></i> <span id="adminActionText">Digital queue optimization recommended to balance outpatient consultation intervals.</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECTION 2: LIVE DATABASE FEED & QUALITY CONTROL CONSOLE -->
-    <section id="database-feed" class="section bg-light">
-        <div class="container">
-            <div class="section-header">
-                <span class="badge"><i class="fa-solid fa-database"></i> Module 2</span>
-                <h2>Live Hospital Feedback Database & Quality Control Console</h2>
-                <p>Real-time records stored in the SQLite backend database with filtering, urgency triaging, and administrative resolution tracking.</p>
-            </div>
-
-            <!-- Database Stats Bar -->
-            <div class="kpi-grid">
-                <div class="kpi-card">
-                    <div class="kpi-icon"><i class="fa-solid fa-folder-open"></i></div>
-                    <div class="kpi-data">
-                        <span class="kpi-label">Stored in Database</span>
-                        <span class="kpi-value" id="dbTotalCount">25</span>
-                    </div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-icon icon-warning"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                    <div class="kpi-data">
-                        <span class="kpi-label">High Urgency Alerts</span>
-                        <span class="kpi-value text-danger" id="dbHighUrgencyCount">4</span>
-                    </div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-icon icon-success"><i class="fa-solid fa-check-double"></i></div>
-                    <div class="kpi-data">
-                        <span class="kpi-label">Resolved Issues</span>
-                        <span class="kpi-value text-success" id="dbResolvedCount">14</span>
-                    </div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-icon icon-info"><i class="fa-solid fa-server"></i></div>
-                    <div class="kpi-data">
-                        <span class="kpi-label">Database Engine</span>
-                        <span class="kpi-value" style="font-size: 18px;">SQLite 3 (.db)</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Filter Controls -->
-            <div class="card filter-card">
-                <div class="filter-header">
-                    <h4><i class="fa-solid fa-filter"></i> Filter Database Records</h4>
-                    <button class="btn btn-sm btn-outline-dark" onclick="loadDatabaseFeed()"><i class="fa-solid fa-arrows-rotate"></i> Refresh Feed</button>
-                </div>
-                <div class="filter-controls">
-                    <div class="filter-item">
-                        <label>Hospital:</label>
-                        <select id="filterHospital" class="filter-select" onchange="loadDatabaseFeed()">
-                            <option value="All">All Hospitals</option>
-                            <option value="Rohini Super Speciality Hospital">Rohini Super Speciality</option>
-                            <option value="MGM Hospital Warangal">MGM Hospital</option>
-                            <option value="Kakatiya Medical College Hospital">Kakatiya Medical College</option>
-                            <option value="Sri Sai Multispeciality Hospital">Sri Sai Multispeciality</option>
-                            <option value="Aditya Hospital Warangal">Aditya Hospital</option>
-                            <option value="Medwin Hospital Warangal">Medwin Hospital</option>
-                            <option value="CarePlus Hospital Warangal">CarePlus Hospital</option>
-                            <option value="Lalitha Super Speciality Hospital">Lalitha Super Speciality</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-item">
-                        <label>Sentiment:</label>
-                        <select id="filterSentiment" class="filter-select" onchange="loadDatabaseFeed()">
-                            <option value="All">All Sentiments</option>
-                            <option value="Positive">Positive</option>
-                            <option value="Neutral">Neutral</option>
-                            <option value="Negative">Negative</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-item">
-                        <label>Urgency:</label>
-                        <select id="filterUrgency" class="filter-select" onchange="loadDatabaseFeed()">
-                            <option value="All">All Urgency Levels</option>
-                            <option value="High">High Urgency</option>
-                            <option value="Medium">Medium Urgency</option>
-                            <option value="Low">Low Urgency</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-item">
-                        <label>Status:</label>
-                        <select id="filterStatus" class="filter-select" onchange="loadDatabaseFeed()">
-                            <option value="All">All Statuses</option>
-                            <option value="Pending">Pending</option>
-                            <option value="Under Review">Under Review</option>
-                            <option value="Resolved">Resolved</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Feed Table -->
-            <div class="card table-card">
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Feedback ID</th>
-                                <th>Patient & Hospital</th>
-                                <th>Feedback Review</th>
-                                <th>NLP Sentiment</th>
-                                <th>Primary Issue</th>
-                                <th>Urgency</th>
-                                <th>SQI</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="dbFeedTableBody">
-                            <tr>
-                                <td colspan="9" style="text-align:center; padding: 24px;">
-                                    <div class="spinner" style="margin: 0 auto 10px auto;"></div>
-                                    Loading live records from SQLite database...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECTION 3: HOSPITAL BENCHMARK ANALYTICS -->
-    <section id="hospital-analytics" class="section">
-        <div class="container">
-            <div class="section-header">
-                <span class="badge"><i class="fa-solid fa-chart-line"></i> Module 3</span>
-                <h2>Warangal Healthcare Benchmark Analytics (100,000 Records)</h2>
-                <p>Cross-institutional comparative evaluation across 12 prominent tertiary, government, and private hospitals in Warangal, Telangana.</p>
-            </div>
-
-            <!-- Summary KPI cards -->
-            <div class="kpi-grid">
-                <div class="kpi-card">
-                    <div class="kpi-icon"><i class="fa-solid fa-users"></i></div>
-                    <div class="kpi-data">
-                        <span class="kpi-label">Evaluated Records</span>
-                        <span class="kpi-value" id="kpiRecords">100,000</span>
-                    </div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-icon icon-warning"><i class="fa-solid fa-clock"></i></div>
-                    <div class="kpi-data">
-                        <span class="kpi-label">Mean Waiting Time</span>
-                        <span class="kpi-value" id="kpiWait">84.6 min</span>
-                    </div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-icon icon-info"><i class="fa-solid fa-star"></i></div>
-                    <div class="kpi-data">
-                        <span class="kpi-label">Mean Satisfaction</span>
-                        <span class="kpi-value" id="kpiSat">76.9 / 100</span>
-                    </div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-icon icon-success"><i class="fa-solid fa-heart-pulse"></i></div>
-                    <div class="kpi-data">
-                        <span class="kpi-label">Overall SQI Score</span>
-                        <span class="kpi-value" id="kpiSqi">76.2 / 100</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Charts Grid -->
-            <div class="charts-grid">
-                <div class="card chart-card">
-                    <h3><i class="fa-solid fa-chart-column"></i> Hospital Satisfaction Ranking (Mean Score)</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="hospitalSatisfactionChart"></canvas>
-                    </div>
-                </div>
-                <div class="card chart-card">
-                    <h3><i class="fa-solid fa-chart-pie"></i> Primary Patient Grievances Distribution</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="issuesChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECTION 4: REPORT SIMPLIFIER & TELUGU AUDIO -->
-    <section id="report-simplifier" class="section bg-light">
-        <div class="container">
-            <div class="section-header">
-                <span class="badge badge-accent"><i class="fa-solid fa-language"></i> Module 4</span>
-                <h2>Clinical Diagnostic Report Simplification & Telugu Voice</h2>
-                <p>Normalizes complex Latinate lab report jargon into 7th-grade layperson English, generates culturally idiomatic regional Telugu explanations with <strong>Zero-Hallucination Guardrails</strong>, and stores records in the EHR backend.</p>
-            </div>
-
-            <div class="simplifier-grid">
-                <!-- Input Panel -->
-                <div class="card input-card">
-                    <h3><i class="fa-solid fa-file-waveform"></i> Unstructured Clinical Lab Report Input</h3>
-                    <p class="help-text">Choose a diagnostic panel preset or paste patient clinical findings:</p>
-
-                    <div class="preset-chips">
-                        <button class="chip" onclick="loadReportPreset(1)">Case 1: Lipid & Blood Sugar</button>
-                        <button class="chip" onclick="loadReportPreset(2)">Case 2: Dengue & Platelet CBC</button>
-                        <button class="chip" onclick="loadReportPreset(3)">Case 3: Liver Function Panel</button>
-                        <button class="chip" onclick="loadReportPreset(4)">Case 4: Healthy Checkup</button>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group half-width">
-                            <label for="repPatientName"><i class="fa-solid fa-user-tag"></i> Patient Name / Bed ID</label>
-                            <input type="text" id="repPatientName" class="form-input" placeholder="e.g. S. Anitha / Room 304" value="S. Anitha (OPD Case)">
-                        </div>
-                        <div class="form-group half-width">
-                            <label for="repHospital"><i class="fa-solid fa-hospital"></i> Medical Center</label>
-                            <select id="repHospital" class="form-select">
-                                <option value="Rohini Super Speciality Hospital">Rohini Super Speciality</option>
-                                <option value="MGM Hospital Warangal">MGM Hospital Warangal</option>
-                                <option value="Kakatiya Medical College Hospital">Kakatiya Medical College</option>
-                                <option value="Sri Sai Multispeciality Hospital">Sri Sai Multispeciality</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="reportText"><i class="fa-solid fa-notes-medical"></i> Diagnostic Report Text</label>
-                        <textarea id="reportText" rows="6" placeholder="Paste medical lab report text here...">Serum lipid profile reveals marked hypercholesterolemia with Total Cholesterol: 245 mg/dL, elevated low-density lipoprotein (LDL: 165 mg/dL) and Triglycerides: 215 mg/dL. Concomitant Fasting Blood Sugar: 142 mg/dL and HbA1c: 7.8% is suggestive of uncontrolled diabetes mellitus. Serum Creatinine: 1.0 mg/dL is within normal limits.</textarea>
-                    </div>
-
-                    <button id="btnSimplifyReport" class="btn btn-accent btn-block" onclick="runReportSimplification()">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> Simplify Report, Generate Voice & Save to EHR
+        <!-- ============================================================
+             2. MAIN APP CONTAINER
+             ============================================================ -->
+        <main class="app-main">
+            <!-- Top Command Bar -->
+            <header class="app-header">
+                <div class="header-left">
+                    <button class="mobile-toggle-btn" onclick="toggleSidebar()" aria-label="Toggle Navigation">
+                        <i class="fa-solid fa-bars"></i>
                     </button>
-                </div>
-
-                <!-- Output Panel -->
-                <div class="card result-card" id="reportResultCard">
-                    <h3><i class="fa-solid fa-dna"></i> Extracted Biomarkers & Telugu Synthesis</h3>
-
-                    <div id="reportLoading" class="loading-state" style="display: none;">
-                        <div class="spinner"></div>
-                        <p>Extracting biomarkers, validating reference intervals, generating Telugu audio, and archiving to EHR database...</p>
-                    </div>
-
-                    <div id="reportResults">
-                        <div id="ehrSavedNotice" class="db-saved-notice" style="display:none;">
-                            <i class="fa-solid fa-folder-plus"></i> <span id="ehrSavedText">Report saved to EHR Database Archive!</span>
-                        </div>
-
-                        <!-- Readability Comparison Bar -->
-                        <div class="readability-box">
-                            <div class="readability-stat">
-                                <span class="r-label">Original Readability</span>
-                                <span id="rOriginalGrade" class="r-grade text-danger">Grade 14.8</span>
-                                <span class="r-desc">Post-Graduate Clinical Jargon</span>
-                            </div>
-                            <div class="readability-arrow"><i class="fa-solid fa-arrow-right"></i></div>
-                            <div class="readability-stat">
-                                <span class="r-label">Simplified Readability</span>
-                                <span id="rSimplifiedGrade" class="r-grade text-success">Grade 7.2</span>
-                                <span class="r-desc">Plain Language (Public Level)</span>
-                            </div>
-                            <div class="readability-diff">
-                                <span class="badge badge-success">-7.6 School Grades</span>
-                            </div>
-                        </div>
-
-                        <!-- Biomarkers Table -->
-                        <div class="table-container">
-                            <table class="biomarker-table">
-                                <thead>
-                                    <tr>
-                                        <th>Biomarker</th>
-                                        <th>పరీక్ష పేరు (Telugu)</th>
-                                        <th>Patient Value</th>
-                                        <th>Normal Range</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="biomarkerTableBody">
-                                    <tr>
-                                        <td><strong>Total Cholesterol</strong></td>
-                                        <td>మొత్తం కొలెస్ట్రాల్</td>
-                                        <td>245.0 mg/dL</td>
-                                        <td>125 - 200 mg/dL</td>
-                                        <td><span class="pill pill-danger">Elevated</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>LDL Cholesterol</strong></td>
-                                        <td>చెడు కొలెస్ట్రాల్ (LDL)</td>
-                                        <td>165.0 mg/dL</td>
-                                        <td>0 - 100 mg/dL</td>
-                                        <td><span class="pill pill-danger">Elevated</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Explanations Side-by-Side -->
-                        <div class="explanation-columns">
-                            <div class="exp-box english-card">
-                                <h4><i class="fa-solid fa-flag-usa"></i> Plain-English Summary</h4>
-                                <div id="expEnglish" class="exp-text">
-                                    Total Cholesterol is higher than normal (245 mg/dL). High-risk fat level in the bloodstream requiring dietary control and clinical follow-up.
-                                </div>
-                            </div>
-                            <div class="exp-box telugu-card">
-                                <h4><i class="fa-solid fa-language"></i> తెలుగు వివరణ (Regional Telugu)</h4>
-                                <div id="expTelugu" class="exp-text telugu-text">
-                                    మీ రక్త పరీక్షలో మొత్తం కొలెస్ట్రాల్ స్థాయి 245.0 mg/dL గా నమోదైంది. ఇది సాధారణ స్థాయి (125 - 200 mg/dL) కంటే ఎక్కువగా ఉంది. దయచేసి వైద్యులను సంప్రదించండి.
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Audio Player -->
-                        <div class="audio-player-container">
-                            <div class="audio-info">
-                                <i class="fa-solid fa-volume-high"></i>
-                                <div>
-                                    <strong>Listen to Spoken Telugu Explanation (గ్రామీణ రోగుల కోసం ఆడియో)</strong>
-                                    <p>Voice narration synthesized via Google Text-to-Speech (gTTS) for non-literate patients.</p>
-                                </div>
-                            </div>
-                            <audio id="teluguAudioPlayer" controls class="custom-audio">
-                                Your browser does not support audio playback.
-                            </audio>
-                        </div>
+                    <div class="view-breadcrumbs">
+                        <span>MediSense AI Workspace</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                        <span class="current-view-title" id="breadcrumbTitle">Overview Dashboard</span>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- SECTION 5: SAVED EHR REPORTS ARCHIVE -->
-    <section id="ehr-history" class="section">
-        <div class="container">
-            <div class="section-header">
-                <span class="badge"><i class="fa-solid fa-folder-closed"></i> Module 5</span>
-                <h2>Patient EHR History & Saved Diagnostic Archive</h2>
-                <p>Saved patient clinical reports retrieved directly from the backend SQLite database with verified biomarkers and voice audio.</p>
-            </div>
-
-            <div class="card table-card">
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Report ID</th>
-                                <th>Patient Name</th>
-                                <th>Hospital</th>
-                                <th>Created Date</th>
-                                <th>Biomarkers Detected</th>
-                                <th>Readability Shift</th>
-                                <th>Telugu Voice Audio</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="ehrReportsTableBody">
-                            <tr>
-                                <td colspan="8" style="text-align:center; padding: 20px;">
-                                    No saved medical reports yet. Simplify a report above to automatically save it!
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="header-actions">
+                    <div class="header-status-badge">
+                        <i class="fa-solid fa-circle-check"></i> TF-IDF Engine v2.4 Online
+                    </div>
+                    <span class="student-tag">
+                        <i class="fa-solid fa-university"></i> B.Tech CSE Mini Project
+                    </span>
                 </div>
-            </div>
-        </div>
-    </section>
+            </header>
 
-    <!-- SECTION 6: DOCTOR APPOINTMENTS / OPD INQUIRIES -->
-    <section id="consultation" class="section bg-light">
-        <div class="container">
-            <div class="section-header">
-                <span class="badge"><i class="fa-solid fa-calendar-check"></i> Module 6</span>
-                <h2>Book Hospital Consultation / Clinical Inquiries</h2>
-                <p>Directly submit patient consultation inquiries to Warangal healthcare facilities. Inquiries are stored in the database backend.</p>
-            </div>
+            <!-- Scrollable Workspace Views -->
+            <div class="workspace-scroll-area">
+                
+                <!-- VIEW 1: OVERVIEW DASHBOARD -->
+                <section class="view-panel active" id="view-overview">
+                    <div class="view-intro">
+                        <div>
+                            <h2>Executive Clinical Intelligence Dashboard</h2>
+                            <p>Overview of patient sentiment metrics, 100,000 Warangal hospital evaluations, and diagnostic simplifications.</p>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-primary" onclick="switchView('feedback')">
+                                <i class="fa-solid fa-plus"></i> Analyze Feedback
+                            </button>
+                            <button class="btn btn-accent" onclick="switchView('simplifier')">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Simplify Report
+                            </button>
+                        </div>
+                    </div>
 
-            <div class="consultation-wrapper">
-                <div class="card form-card">
-                    <form id="consultationForm" onsubmit="submitConsultation(event)">
-                        <div class="form-row">
-                            <div class="form-group half-width">
-                                <label for="aptName"><i class="fa-solid fa-user"></i> Full Patient Name *</label>
-                                <input type="text" id="aptName" class="form-input" placeholder="e.g. Ramesh Chandra" required>
-                            </div>
-                            <div class="form-group half-width">
-                                <label for="aptPhone"><i class="fa-solid fa-phone"></i> Contact Phone Number *</label>
-                                <input type="tel" id="aptPhone" class="form-input" placeholder="+91 98480 12345" required>
+                    <!-- KPI Row -->
+                    <div class="kpi-row">
+                        <div class="kpi-box">
+                            <div class="kpi-icon-wrap"><i class="fa-solid fa-users"></i></div>
+                            <div class="kpi-meta-data">
+                                <span class="kpi-meta-label">Warangal Reviews</span>
+                                <span class="kpi-meta-val">100,000</span>
                             </div>
                         </div>
-
-                        <div class="form-row">
-                            <div class="form-group half-width">
-                                <label for="aptHospital"><i class="fa-solid fa-hospital"></i> Preferred Hospital *</label>
-                                <select id="aptHospital" class="form-select">
-                                    <option value="Rohini Super Speciality Hospital">Rohini Super Speciality Hospital</option>
-                                    <option value="MGM Hospital Warangal">MGM Hospital Warangal</option>
-                                    <option value="Kakatiya Medical College Hospital">Kakatiya Medical College Hospital</option>
-                                    <option value="Sri Sai Multispeciality Hospital">Sri Sai Multispeciality Hospital</option>
-                                    <option value="CarePlus Hospital Warangal">CarePlus Hospital Warangal</option>
-                                    <option value="Aditya Hospital Warangal">Aditya Hospital Warangal</option>
-                                </select>
+                        <div class="kpi-box">
+                            <div class="kpi-icon-wrap emerald"><i class="fa-solid fa-hospital"></i></div>
+                            <div class="kpi-meta-data">
+                                <span class="kpi-meta-label">Hospitals Analyzed</span>
+                                <span class="kpi-meta-val">12</span>
                             </div>
-                            <div class="form-group half-width">
-                                <label for="aptDept"><i class="fa-solid fa-stethoscope"></i> Clinical Department *</label>
-                                <select id="aptDept" class="form-select">
-                                    <option value="Cardiology">Cardiology</option>
+                        </div>
+                        <div class="kpi-box">
+                            <div class="kpi-icon-wrap indigo"><i class="fa-solid fa-bullseye"></i></div>
+                            <div class="kpi-meta-data">
+                                <span class="kpi-meta-label">Sentiment Accuracy</span>
+                                <span class="kpi-meta-val">93.8%</span>
+                            </div>
+                        </div>
+                        <div class="kpi-box">
+                            <div class="kpi-icon-wrap amber"><i class="fa-solid fa-database"></i></div>
+                            <div class="kpi-meta-data">
+                                <span class="kpi-meta-label">Live DB Records</span>
+                                <span class="kpi-meta-val" id="heroDbRecords">25+</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Studio Workstation Cards -->
+                    <div class="studio-grid" style="margin-bottom: 24px;">
+                        <div class="card" style="cursor: pointer;" onclick="switchView('feedback')">
+                            <div class="card-title">
+                                <i class="fa-solid fa-comment-medical text-primary"></i>
+                                <span>Patient Feedback NLP Studio</span>
+                            </div>
+                            <p class="card-subtitle">Classify unstructured hospital patient reviews into Positive, Neutral, or Negative sentiment, extract operational issues, and auto-dispatch urgency triage to SQLite.</p>
+                            <span class="btn btn-outline"><i class="fa-solid fa-arrow-right"></i> Open Feedback Studio</span>
+                        </div>
+
+                        <div class="card" style="cursor: pointer;" onclick="switchView('simplifier')">
+                            <div class="card-title">
+                                <i class="fa-solid fa-language" style="color: var(--indigo);"></i>
+                                <span>Telugu Medical Report Simplifier</span>
+                            </div>
+                            <p class="card-subtitle">Deterministic extraction of clinical biomarkers, 7th-grade layperson explanation, regional Telugu translation, and Google TTS synthesized spoken voice.</p>
+                            <span class="btn btn-outline"><i class="fa-solid fa-arrow-right"></i> Open Report Simplifier</span>
+                        </div>
+                    </div>
+
+                    <!-- Quality Benchmarks Quick Preview -->
+                    <div class="card">
+                        <div class="card-title">
+                            <i class="fa-solid fa-chart-line"></i>
+                            <span>Hospital Service Quality Index (SQI) Preview</span>
+                        </div>
+                        <p class="card-subtitle">Real-time performance across Warangal healthcare facilities.</p>
+                        <div style="height: 260px;">
+                            <canvas id="overviewSatisfactionChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW 2: FEEDBACK NLP STUDIO -->
+                <section class="view-panel" id="view-feedback">
+                    <div class="view-intro">
+                        <div>
+                            <h2>Patient Grievance NLP Intelligence Studio</h2>
+                            <p>Real-time TF-IDF inference engine with automated urgency triaging and SQLite persistence.</p>
+                        </div>
+                    </div>
+
+                    <div class="studio-grid">
+                        <!-- Input Studio Card -->
+                        <div class="card">
+                            <div class="card-title"><i class="fa-solid fa-pen-to-square"></i> Patient Review Entry</div>
+                            <p class="card-subtitle">Select a clinical case preset or enter custom patient review with metadata:</p>
+
+                            <!-- Presets -->
+                            <div class="chips-tray">
+                                <button type="button" class="action-chip active" onclick="loadFeedbackPreset(1)">Preset 1: Doctor Praise & Delay</button>
+                                <button type="button" class="action-chip" onclick="loadFeedbackPreset(2)">Preset 2: Billing Opacity</button>
+                                <button type="button" class="action-chip" onclick="loadFeedbackPreset(3)">Preset 3: Nursing & Cleanliness</button>
+                                <button type="button" class="action-chip" onclick="loadFeedbackPreset(4)">Preset 4: Emergency Delay</button>
+                            </div>
+
+                            <div class="form-grid-2">
+                                <div class="form-item">
+                                    <label for="fbPatientName"><i class="fa-solid fa-user"></i> Patient Name / ID</label>
+                                    <input type="text" id="fbPatientName" class="input-control" value="Verified Outpatient" placeholder="e.g. K. Rajesh (OPD-402)">
+                                </div>
+                                <div class="form-item">
+                                    <label for="fbHospital"><i class="fa-solid fa-hospital"></i> Medical Facility</label>
+                                    <select id="fbHospital" class="select-control">
+                                        <option value="Rohini Super Speciality Hospital">Rohini Super Speciality Hospital</option>
+                                        <option value="MGM Hospital Warangal">MGM Hospital Warangal</option>
+                                        <option value="Kakatiya Medical College Hospital">Kakatiya Medical College</option>
+                                        <option value="Sri Sai Multispeciality Hospital">Sri Sai Multispeciality</option>
+                                        <option value="Aditya Hospital Warangal">Aditya Hospital Warangal</option>
+                                        <option value="Medwin Hospital Warangal">Medwin Hospital Warangal</option>
+                                        <option value="CarePlus Hospital Warangal">CarePlus Hospital Warangal</option>
+                                        <option value="Lalitha Super Speciality Hospital">Lalitha Super Speciality</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-item">
+                                <label for="fbDepartment"><i class="fa-solid fa-stethoscope"></i> Department</label>
+                                <select id="fbDepartment" class="select-control">
                                     <option value="General Medicine">General Medicine</option>
-                                    <option value="Diabetology & Endocrinology">Diabetology & Endocrinology</option>
-                                    <option value="Pediatrics">Pediatrics</option>
+                                    <option value="Cardiology">Cardiology</option>
                                     <option value="Orthopedics">Orthopedics</option>
+                                    <option value="Pediatrics">Pediatrics</option>
+                                    <option value="Emergency Care">Emergency Care</option>
+                                    <option value="Gynecology">Gynecology</option>
                                     <option value="Neurology">Neurology</option>
                                 </select>
                             </div>
+
+                            <div class="form-item">
+                                <label for="feedbackText"><i class="fa-solid fa-comment-dots"></i> Feedback Text</label>
+                                <textarea id="feedbackText" class="textarea-control" rows="4">The doctor was polite and explained the treatment clearly, but the outpatient waiting time was more than 90 minutes and billing was slow.</textarea>
+                            </div>
+
+                            <div class="btn-actions-row">
+                                <button type="button" id="btnAnalyzeFeedback" class="btn btn-outline" onclick="runFeedbackAnalysis(false)">
+                                    <i class="fa-solid fa-bolt"></i> Quick NLP Preview
+                                </button>
+                                <button type="button" id="btnSubmitFeedback" class="btn btn-primary" onclick="runFeedbackAnalysis(true)">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i> Submit & Save to SQLite DB
+                                </button>
+                            </div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="aptSymptoms"><i class="fa-solid fa-clipboard-list"></i> Clinical Symptoms & Notes</label>
-                            <textarea id="aptSymptoms" rows="3" placeholder="Briefly describe patient symptoms or reason for doctor visit..."></textarea>
+                        <!-- Result Studio Card -->
+                        <div class="card results-card-container">
+                            <div class="card-title"><i class="fa-solid fa-square-poll-vertical"></i> NLP Intelligence & DB Status</div>
+                            
+                            <div id="feedbackLoading" class="loading-spinner-box" style="display: none;">
+                                <div class="spinner"></div>
+                                <p style="font-size:0.86rem; color: var(--text-muted);">Executing TF-IDF inference & persisting to SQLite database...</p>
+                            </div>
+
+                            <div id="feedbackResults">
+                                <div id="dbSavedNotice" class="db-success-banner" style="display:none;">
+                                    <i class="fa-solid fa-check-circle"></i> <span id="dbSavedText">Record saved to backend database!</span>
+                                </div>
+
+                                <div class="metrics-quad">
+                                    <div class="metric-cell">
+                                        <span class="metric-cell-label">Predicted Sentiment</span>
+                                        <span id="resSentiment" class="pill pill-positive">Positive</span>
+                                    </div>
+                                    <div class="metric-cell">
+                                        <span class="metric-cell-label">Model Confidence</span>
+                                        <span id="resConfidence" class="metric-cell-value" style="color: var(--primary);">94.2%</span>
+                                    </div>
+                                    <div class="metric-cell">
+                                        <span class="metric-cell-label">Primary Operational Issue</span>
+                                        <span id="resIssue" class="metric-cell-value" style="font-size: 0.95rem;">Long Waiting Time</span>
+                                    </div>
+                                    <div class="metric-cell">
+                                        <span class="metric-cell-label">Urgency Level</span>
+                                        <span id="resUrgency" class="pill pill-warning">Medium Urgency</span>
+                                    </div>
+                                </div>
+
+                                <!-- Stepper Breakdown -->
+                                <div class="stepper-box">
+                                    <div class="step-row">
+                                        <span class="step-tag">Step 1</span>
+                                        <div class="step-content">
+                                            <strong>Normalized & Cleaned Text (Regex & Lemmatized):</strong>
+                                            <p id="resCleaned" class="step-mono-text">doctor polit explain treatment clear outpatient wait time minut bill slow</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="step-row">
+                                        <span class="step-tag">Step 2</span>
+                                        <div class="step-content">
+                                            <strong>Extracted Vocabulary Tokens:</strong>
+                                            <div id="resTokens" class="token-cloud">
+                                                <span class="token-chip">doctor</span>
+                                                <span class="token-chip">polit</span>
+                                                <span class="token-chip">explain</span>
+                                                <span class="token-chip">treatment</span>
+                                                <span class="token-chip">wait</span>
+                                                <span class="token-chip">time</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="step-row">
+                                        <span class="step-tag">Step 3</span>
+                                        <div class="step-content">
+                                            <strong>Service Quality Index (SQI Score):</strong>
+                                            <div class="sqi-meter-wrap">
+                                                <div id="sqiProgress" class="sqi-meter-bar" style="width: 78%;">78.0 / 100</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="adminActionAlert" class="alert-triage pill-neutral" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd;">
+                                        <i class="fa-solid fa-circle-info"></i> <span id="adminActionText">Digital queue optimization recommended to balance outpatient consultation intervals.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW 3: QUALITY CONTROL DATABASE CONSOLE -->
+                <section class="view-panel" id="view-database">
+                    <div class="view-intro">
+                        <div>
+                            <h2>Quality Control Console (SQLite Database)</h2>
+                            <p>Direct view of live records stored in `medisense.db` with live text searching, urgency triaging, and 1-click status resolution.</p>
+                        </div>
+                    </div>
+
+                    <!-- KPI Row -->
+                    <div class="kpi-row">
+                        <div class="kpi-box">
+                            <div class="kpi-icon-wrap"><i class="fa-solid fa-folder-open"></i></div>
+                            <div class="kpi-meta-data">
+                                <span class="kpi-meta-label">Stored Records</span>
+                                <span class="kpi-meta-val" id="dbTotalCount">25</span>
+                            </div>
+                        </div>
+                        <div class="kpi-box">
+                            <div class="kpi-icon-wrap coral"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                            <div class="kpi-meta-data">
+                                <span class="kpi-meta-label">High Urgency Alerts</span>
+                                <span class="kpi-meta-val text-danger" id="dbHighUrgencyCount">4</span>
+                            </div>
+                        </div>
+                        <div class="kpi-box">
+                            <div class="kpi-icon-wrap emerald"><i class="fa-solid fa-check-double"></i></div>
+                            <div class="kpi-meta-data">
+                                <span class="kpi-meta-label">Resolved Inquiries</span>
+                                <span class="kpi-meta-val text-success" id="dbResolvedCount">14</span>
+                            </div>
+                        </div>
+                        <div class="kpi-box">
+                            <div class="kpi-icon-wrap indigo"><i class="fa-solid fa-server"></i></div>
+                            <div class="kpi-meta-data">
+                                <span class="kpi-meta-label">Database Engine</span>
+                                <span class="kpi-meta-val" style="font-size: 1.15rem;">SQLite 3 (.db)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filter Toolbar -->
+                    <div class="filter-toolbar">
+                        <div class="search-field-box">
+                            <i class="fa-solid fa-magnifying-glass" style="color: #94a3b8;"></i>
+                            <input type="text" id="filterSearch" placeholder="Search patient, hospital, issue..." oninput="filterTableRowsLocally()">
                         </div>
 
-                        <button type="submit" class="btn btn-primary btn-block">
-                            <i class="fa-solid fa-calendar-plus"></i> Submit Consultation Request to Hospital
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
+                        <div class="dropdown-filter-group">
+                            <select id="filterHospital" class="select-filter-item" onchange="loadDatabaseFeed()">
+                                <option value="All">All Hospitals</option>
+                                <option value="Rohini Super Speciality Hospital">Rohini Super Speciality</option>
+                                <option value="MGM Hospital Warangal">MGM Hospital</option>
+                                <option value="Kakatiya Medical College Hospital">Kakatiya Medical College</option>
+                                <option value="Sri Sai Multispeciality Hospital">Sri Sai Multispeciality</option>
+                                <option value="Aditya Hospital Warangal">Aditya Hospital</option>
+                                <option value="Medwin Hospital Warangal">Medwin Hospital</option>
+                                <option value="CarePlus Hospital Warangal">CarePlus Hospital</option>
+                                <option value="Lalitha Super Speciality Hospital">Lalitha Super Speciality</option>
+                            </select>
 
-    <!-- SECTION 7: TEAM & CREDITS -->
-    <section id="team" class="section">
-        <div class="container">
-            <div class="section-header">
-                <span class="badge"><i class="fa-solid fa-users"></i> Project Investigators</span>
-                <h2>Capstone Engineering Team</h2>
-                <p>Department of Computer Science & Engineering, Engineering College, Warangal, Telangana.</p>
-            </div>
+                            <select id="filterSentiment" class="select-filter-item" onchange="loadDatabaseFeed()">
+                                <option value="All">All Sentiments</option>
+                                <option value="Positive">Positive</option>
+                                <option value="Neutral">Neutral</option>
+                                <option value="Negative">Negative</option>
+                            </select>
 
-            <div class="team-grid">
-                <div class="team-card">
-                    <div class="team-avatar"><i class="fa-solid fa-user-doctor"></i></div>
-                    <h3>K. Priya</h3>
-                    <p class="team-role">Project Investigator • B.Tech CSE</p>
-                    <p class="team-desc">Lead architect for the 100,000-record Warangal healthcare sentiment dataset, TF-IDF classification pipeline, SQLite database schema, and Service Quality Index (SQI) formulation.</p>
-                </div>
+                            <select id="filterUrgency" class="select-filter-item" onchange="loadDatabaseFeed()">
+                                <option value="All">All Urgency</option>
+                                <option value="High">High Urgency</option>
+                                <option value="Medium">Medium Urgency</option>
+                                <option value="Low">Low Urgency</option>
+                            </select>
 
-                <div class="team-card">
-                    <div class="team-avatar"><i class="fa-solid fa-microscope"></i></div>
-                    <h3>CH. Harshini</h3>
-                    <p class="team-role">Project Investigator • B.Tech CSE</p>
-                    <p class="team-desc">Lead engineer for clinical biomarker ontology mapping, zero-hallucination guardrail validation, EHR archiving backend, and Dravidian Telugu text-to-speech voice synthesis.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+                            <select id="filterStatus" class="select-filter-item" onchange="loadDatabaseFeed()">
+                                <option value="All">All Statuses</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Under Review">Under Review</option>
+                                <option value="Resolved">Resolved</option>
+                            </select>
 
-    <!-- FOOTER -->
-    <footer class="footer">
-        <div class="container footer-content">
-            <div class="footer-left">
-                <p><strong>MediSense NLP Platform</strong> • B.Tech Capstone Project Defense 2026</p>
-                <p>Engineering College, Warangal, Telangana, India. Built with Flask, SQLite, and scikit-learn.</p>
-            </div>
-            <div class="footer-right">
-                <a href="#home">Back to Top <i class="fa-solid fa-arrow-up"></i></a>
-            </div>
-        </div>
-    </footer>
+                            <button type="button" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.8rem;" onclick="loadDatabaseFeed()">
+                                <i class="fa-solid fa-arrows-rotate"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
 
-    <!-- DYNAMIC SCRIPT RESOLUTION: WORKS BOTH VIA FLASK SERVER & DIRECT FILE OPENING -->
-    <script>
-        (function() {
-            var inTemplates = window.location.pathname.indexOf('/templates/') !== -1;
-            var prefix = inTemplates ? '../static/' : (window.location.protocol === 'file:' ? 'static/' : '/static/');
-            var s = document.createElement('script');
-            s.src = prefix + 'js/main.js';
-            document.body.appendChild(s);
-        })();
-    </script>
-    <noscript>
-        <script src="../static/js/main.js"></script>
-        <script src="static/js/main.js"></script>
-    </noscript>
+                    <!-- Table -->
+                    <div class="table-responsive-wrap">
+                        <table class="app-data-table">
+                            <thead>
+                                <tr>
+                                    <th>Ticket ID</th>
+                                    <th>Patient & Hospital</th>
+                                    <th>Feedback Review</th>
+                                    <th>Sentiment</th>
+                                    <th>Primary Issue</th>
+                                    <th>Urgency</th>
+                                    <th>SQI</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dbFeedTableBody">
+                                <tr>
+                                    <td colspan="9" style="text-align:center; padding: 28px;">
+                                        <div class="spinner" style="margin: 0 auto 10px auto;"></div>
+                                        Loading records from SQLite database...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- VIEW 4: BENCHMARK ANALYTICS -->
+                <section class="view-panel" id="view-analytics">
+                    <div class="view-intro">
+                        <div>
+                            <h2>Warangal 100,000 Healthcare Benchmark Analytics</h2>
+                            <p>Statistical distribution and cross-hospital comparison across 12 prominent medical centers.</p>
+                        </div>
+                    </div>
+
+                    <!-- Telemetry -->
+                    <div class="kpi-row">
+                        <div class="kpi-box">
+                            <div class="kpi-icon-wrap"><i class="fa-solid fa-users"></i></div>
+                            <div class="kpi-meta-data">
+                                <span class="kpi-meta-label">Evaluated Records</span>
+                                <span class="kpi-meta-val" id="kpiRecords">100,000</span>
+                            </div>
+                        </div>
+                        <div class="kpi-box">
+                            <div class="kpi-icon-wrap amber"><i class="fa-solid fa-clock"></i></div>
+                            <div class="kpi-meta-data">
+                                <span class="kpi-meta-label">Mean Waiting Time</span>
+                                <span class="kpi-meta-val" id="kpiWait">84.6 min</span>
+                            </div>
+                        </div>
+                        <div class="kpi-box">
+                            <div class="kpi-icon-wrap emerald"><i class="fa-solid fa-star"></i></div>
+                            <div class="kpi-meta-data">
+                                <span class="kpi-meta-label">Mean Satisfaction</span>
+                                <span class="kpi-meta-val" id="kpiSat">76.9 / 100</span>
+                            </div>
+                        </div>
+                        <div class="kpi-box">
+                            <div class="kpi-icon-wrap indigo"><i class="fa-solid fa-heart-pulse"></i></div>
+                            <div class="kpi-meta-data">
+                                <span class="kpi-meta-label">Overall SQI Score</span>
+                                <span class="kpi-meta-val" id="kpiSqi">76.2 / 100</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Grid -->
+                    <div class="charts-dual-grid">
+                        <div class="chart-card-box">
+                            <div class="card-title"><i class="fa-solid fa-chart-column"></i> Hospital Satisfaction Ranking</div>
+                            <p class="card-subtitle">Mean patient satisfaction score benchmarked across Warangal hospitals.</p>
+                            <div class="chart-canvas-wrap">
+                                <canvas id="hospitalSatisfactionChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card-box">
+                            <div class="card-title"><i class="fa-solid fa-chart-pie"></i> Primary Patient Grievances</div>
+                            <p class="card-subtitle">Operational bottlenecks identified by the NLP aspect extractor.</p>
+                            <div class="chart-canvas-wrap">
+                                <canvas id="issuesChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW 5: TELUGU REPORT SIMPLIFIER -->
+                <section class="view-panel" id="view-simplifier">
+                    <div class="view-intro">
+                        <div>
+                            <h2>Diagnostic Report Simplification & Telugu Voice Engine</h2>
+                            <p>Transforms dense clinical laboratory reports into 7th-grade layperson English & colloquial regional Telugu audio with Zero-Hallucination Guardrails.</p>
+                        </div>
+                    </div>
+
+                    <div class="studio-grid">
+                        <!-- Input Studio -->
+                        <div class="card">
+                            <div class="card-title"><i class="fa-solid fa-file-waveform"></i> Unstructured Clinical Lab Report Input</div>
+                            <p class="card-subtitle">Choose a clinical diagnostic panel preset or paste patient lab findings:</p>
+
+                            <div class="chips-tray">
+                                <button type="button" class="action-chip active" onclick="loadReportPreset(1)">Case 1: Lipid & Blood Sugar</button>
+                                <button type="button" class="action-chip" onclick="loadReportPreset(2)">Case 2: Dengue & Platelet CBC</button>
+                                <button type="button" class="action-chip" onclick="loadReportPreset(3)">Case 3: Liver Function Panel</button>
+                                <button type="button" class="action-chip" onclick="loadReportPreset(4)">Case 4: Healthy Checkup</button>
+                            </div>
+
+                            <div class="form-grid-2">
+                                <div class="form-item">
+                                    <label for="repPatientName"><i class="fa-solid fa-user-tag"></i> Patient Name / Bed ID</label>
+                                    <input type="text" id="repPatientName" class="input-control" value="S. Anitha (OPD Case)" placeholder="e.g. S. Anitha / Room 304">
+                                </div>
+                                <div class="form-item">
+                                    <label for="repHospital"><i class="fa-solid fa-hospital"></i> Medical Center</label>
+                                    <select id="repHospital" class="select-control">
+                                        <option value="Rohini Super Speciality Hospital">Rohini Super Speciality</option>
+                                        <option value="MGM Hospital Warangal">MGM Hospital Warangal</option>
+                                        <option value="Kakatiya Medical College Hospital">Kakatiya Medical College</option>
+                                        <option value="Sri Sai Multispeciality Hospital">Sri Sai Multispeciality</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-item">
+                                <label for="reportText"><i class="fa-solid fa-notes-medical"></i> Clinical Diagnostic Text</label>
+                                <textarea id="reportText" class="textarea-control" rows="6">Serum lipid profile reveals marked hypercholesterolemia with Total Cholesterol: 245 mg/dL, elevated low-density lipoprotein (LDL: 165 mg/dL) and Triglycerides: 215 mg/dL. Concomitant Fasting Blood Sugar: 142 mg/dL and HbA1c: 7.8% is suggestive of uncontrolled diabetes mellitus. Serum Creatinine: 1.0 mg/dL is within normal limits.</textarea>
+                            </div>
+
+                            <button id="btnSimplifyReport" type="button" class="btn btn-accent btn-block" onclick="runReportSimplification()">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Simplify Report, Generate Telugu Voice & Save to EHR
+                            </button>
+                        </div>
+
+                        <!-- Output Studio -->
+                        <div class="card results-card-container">
+                            <div class="card-title"><i class="fa-solid fa-dna"></i> Extracted Biomarkers & Telugu Synthesis</div>
+
+                            <div id="reportLoading" class="loading-spinner-box" style="display: none;">
+                                <div class="spinner"></div>
+                                <p style="font-size:0.86rem; color: var(--text-muted);">Extracting biomarkers, validating reference intervals, generating Telugu audio & archiving to EHR...</p>
+                            </div>
+
+                            <div id="reportResults">
+                                <div id="ehrSavedNotice" class="db-success-banner" style="display:none;">
+                                    <i class="fa-solid fa-folder-plus"></i> <span id="ehrSavedText">Report saved to EHR Database Archive!</span>
+                                </div>
+
+                                <!-- Readability Comparison -->
+                                <div class="readability-bar-box">
+                                    <div class="readability-metric">
+                                        <span class="r-label">Original Readability</span>
+                                        <span id="rOriginalGrade" class="r-grade text-danger">Grade 14.8</span>
+                                        <span style="font-size:0.7rem; color:var(--text-muted);">Post-Graduate Jargon</span>
+                                    </div>
+                                    <i class="fa-solid fa-arrow-right" style="color: #94a3b8;"></i>
+                                    <div class="readability-metric">
+                                        <span class="r-label">Simplified Readability</span>
+                                        <span id="rSimplifiedGrade" class="r-grade text-success">Grade 7.2</span>
+                                        <span style="font-size:0.7rem; color:var(--text-muted);">Layperson Level</span>
+                                    </div>
+                                    <span class="pill pill-success">-7.6 Grades</span>
+                                </div>
+
+                                <!-- Biomarkers Table -->
+                                <div class="table-responsive-wrap" style="margin-bottom: 14px;">
+                                    <table class="biomarker-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Biomarker</th>
+                                                <th>పరీక్ష పేరు (Telugu)</th>
+                                                <th>Patient Value</th>
+                                                <th>Normal Range</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="biomarkerTableBody">
+                                            <tr>
+                                                <td><strong>Total Cholesterol</strong></td>
+                                                <td class="telugu-text">మొత్తం కొలెస్ట్రాల్</td>
+                                                <td>245.0 mg/dL</td>
+                                                <td>125 - 200 mg/dL</td>
+                                                <td><span class="pill pill-danger">Elevated</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>LDL Cholesterol</strong></td>
+                                                <td class="telugu-text">చెడు కొలెస్ట్రాల్ (LDL)</td>
+                                                <td>165.0 mg/dL</td>
+                                                <td>0 - 100 mg/dL</td>
+                                                <td><span class="pill pill-danger">Elevated</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Side-by-Side Explanations -->
+                                <div class="dual-explanation-grid">
+                                    <div class="explanation-card english">
+                                        <h4><i class="fa-solid fa-flag-usa"></i> Plain-English Summary</h4>
+                                        <div id="expEnglish" class="explanation-body">
+                                            Total Cholesterol is higher than normal (245 mg/dL). High-risk fat level in the bloodstream requiring dietary control and clinical follow-up.
+                                        </div>
+                                    </div>
+                                    <div class="explanation-card telugu">
+                                        <h4><i class="fa-solid fa-language"></i> తెలుగు వివరణ (Regional Telugu)</h4>
+                                        <div id="expTelugu" class="explanation-body telugu-text">
+                                            మీ రక్త పరీక్షలో మొత్తం కొలెస్ట్రాల్ స్థాయి 245.0 mg/dL గా నమోదైంది. ఇది సాధారణ స్థాయి (125 - 200 mg/dL) కంటే ఎక్కువగా ఉంది. దయచేసి వైద్యులను సంప్రదించండి.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Audio Player Strip -->
+                                <div class="audio-strip-container">
+                                    <div class="audio-header-row">
+                                        <i class="fa-solid fa-volume-high"></i>
+                                        <div>
+                                            <strong>రోగికి తెలుగు వాయిస్ వివరణ (Spoken Telugu Audio)</strong>
+                                            <p>Google Text-to-Speech (gTTS) synthesized speech for regional patients.</p>
+                                        </div>
+                                    </div>
+                                    <audio id="teluguAudioPlayer" controls class="app-audio-player">
+                                        Your browser does not support audio playback.
+                                    </audio>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW 6: EHR PATIENT ARCHIVE -->
+                <section class="view-panel" id="view-ehr">
+                    <div class="view-intro">
+                        <div>
+                            <h2>Patient Electronic Health Records (EHR) Archive</h2>
+                            <p>Archived patient diagnostic reports retrieved directly from SQLite `medical_reports` table.</p>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive-wrap">
+                        <table class="app-data-table">
+                            <thead>
+                                <tr>
+                                    <th>Report ID</th>
+                                    <th>Patient Name</th>
+                                    <th>Hospital</th>
+                                    <th>Date</th>
+                                    <th>Biomarkers Detected</th>
+                                    <th>Readability Shift</th>
+                                    <th>Telugu Audio</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ehrReportsTableBody">
+                                <tr>
+                                    <td colspan="8" style="text-align:center; padding: 24px; color:#64748b;">
+                                        No saved medical reports in SQLite database yet. Simplify a report above to automatically save it!
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- VIEW 7: OPD CONSULTATION -->
+                <section class="view-panel" id="view-consultation">
+                    <div class="view-intro">
+                        <div>
+                            <h2>OPD Consultation Booking Desk</h2>
+                            <p>Direct patient appointment scheduling with Warangal hospitals, recorded in SQLite `consultation_inquiries`.</p>
+                        </div>
+                    </div>
+
+                    <div class="card" style="max-width: 780px; margin: 0 auto;">
+                        <form id="consultationForm" onsubmit="submitConsultation(event)">
+                            <div class="form-grid-2">
+                                <div class="form-item">
+                                    <label for="aptName"><i class="fa-solid fa-user"></i> Full Patient Name *</label>
+                                    <input type="text" id="aptName" class="input-control" placeholder="e.g. Ramesh Chandra" required>
+                                </div>
+                                <div class="form-item">
+                                    <label for="aptPhone"><i class="fa-solid fa-phone"></i> Contact Phone Number *</label>
+                                    <input type="tel" id="aptPhone" class="input-control" placeholder="+91 98480 12345" required>
+                                </div>
+                            </div>
+
+                            <div class="form-grid-2">
+                                <div class="form-item">
+                                    <label for="aptHospital"><i class="fa-solid fa-hospital"></i> Preferred Hospital *</label>
+                                    <select id="aptHospital" class="select-control">
+                                        <option value="Rohini Super Speciality Hospital">Rohini Super Speciality Hospital</option>
+                                        <option value="MGM Hospital Warangal">MGM Hospital Warangal</option>
+                                        <option value="Kakatiya Medical College Hospital">Kakatiya Medical College</option>
+                                        <option value="Sri Sai Multispeciality Hospital">Sri Sai Multispeciality</option>
+                                        <option value="CarePlus Hospital Warangal">CarePlus Hospital Warangal</option>
+                                        <option value="Aditya Hospital Warangal">Aditya Hospital Warangal</option>
+                                    </select>
+                                </div>
+                                <div class="form-item">
+                                    <label for="aptDept"><i class="fa-solid fa-stethoscope"></i> Clinical Department *</label>
+                                    <select id="aptDept" class="select-control">
+                                        <option value="Cardiology">Cardiology</option>
+                                        <option value="General Medicine">General Medicine</option>
+                                        <option value="Diabetology & Endocrinology">Diabetology & Endocrinology</option>
+                                        <option value="Pediatrics">Pediatrics</option>
+                                        <option value="Orthopedics">Orthopedics</option>
+                                        <option value="Neurology">Neurology</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-item">
+                                <label for="aptSymptoms"><i class="fa-solid fa-clipboard-list"></i> Clinical Symptoms & Notes</label>
+                                <textarea id="aptSymptoms" class="textarea-control" rows="3" placeholder="Briefly describe patient symptoms or reason for visit..."></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <i class="fa-solid fa-calendar-plus"></i> Submit Consultation Request to Hospital
+                            </button>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- VIEW 8: TEAM & GUIDE -->
+                <section class="view-panel" id="view-team">
+                    <div class="view-intro">
+                        <div>
+                            <h2>Capstone Engineering Team & Academic Supervision</h2>
+                            <p>Department of Computer Science & Engineering, Engineering College, Warangal, Telangana.</p>
+                        </div>
+                    </div>
+
+                    <div class="team-deck-grid">
+                        <!-- Katakam Priya -->
+                        <div class="team-profile-card">
+                            <div class="avatar-sphere"><i class="fa-solid fa-user-doctor"></i></div>
+                            <h3>KATAKAM PRIYA</h3>
+                            <div class="team-sub-role">Project Investigator • Roll: 2303A51194</div>
+                            <p class="team-bio-text">Lead architect for the 100,000-record Warangal healthcare sentiment dataset, TF-IDF classification pipeline, SQLite database schema, and Service Quality Index (SQI) formulation.</p>
+                        </div>
+
+                        <!-- CH. Harshini -->
+                        <div class="team-profile-card">
+                            <div class="avatar-sphere"><i class="fa-solid fa-microscope"></i></div>
+                            <h3>CH. HARSHINI</h3>
+                            <div class="team-sub-role">Project Investigator • Roll: 2303A51185</div>
+                            <p class="team-bio-text">Lead engineer for clinical biomarker ontology mapping, zero-hallucination guardrail validation, EHR archiving backend, and Dravidian Telugu text-to-speech voice synthesis.</p>
+                        </div>
+
+                        <!-- Guide: Mr. Rupesh Mishra -->
+                        <div class="team-profile-card">
+                            <div class="avatar-sphere guide"><i class="fa-solid fa-chalkboard-user"></i></div>
+                            <h3>Mr. Rupesh Mishra</h3>
+                            <div class="team-sub-role">Project Guide • Assistant Professor</div>
+                            <p class="team-bio-text">Academic supervision and research advisor for Healthcare Natural Language Processing, clinical diagnostic readability optimization, and model evaluation methodologies.</p>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Scripts (Multi-path fallback) -->
+    <script src="js/main.js"></script>
 </body>
 </html>

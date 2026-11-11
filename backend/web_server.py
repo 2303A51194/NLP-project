@@ -13,8 +13,13 @@ from flask import Flask, render_template, request, jsonify, send_file, send_from
 import nlp_engine as nlp
 import database as db
 
-# Resolve Frontend Directory
-FRONTEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend"))
+# Resolve Frontend Directory (flexible for development & standalone packaged folder)
+candidate_dirs = [
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "1_Modern_Frontend")),
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend")),
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "frontend")),
+]
+FRONTEND_DIR = next((d for d in candidate_dirs if os.path.exists(d)), candidate_dirs[1])
 
 app = Flask(__name__)
 

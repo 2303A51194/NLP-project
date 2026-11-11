@@ -50,7 +50,7 @@ Engineering College, Warangal
 Warangal, Telangana, India  
 harshini.cse@college.edu  
 
-**Faculty Project Guide**  
+**Mr. Rupesh Mishra**  
 *Department of Computer Science and Engineering*  
 Engineering College, Warangal  
 Warangal, Telangana, India  
@@ -367,7 +367,7 @@ def build_docx_paper():
     authors = [
         ("K. Priya", "Student Researcher\nDept. of Computer Science & Engineering\nEngineering College, Warangal\nWarangal, Telangana, India\npriya.cse@college.edu"),
         ("CH. Harshini", "Student Researcher\nDept. of Computer Science & Engineering\nEngineering College, Warangal\nWarangal, Telangana, India\nharshini.cse@college.edu"),
-        ("Faculty Project Guide", "Faculty Supervisor\nDept. of Computer Science & Engineering\nEngineering College, Warangal\nWarangal, Telangana, India\nsupervisor.cse@college.edu")
+        ("Mr. Rupesh Mishra", "Faculty Supervisor\nDept. of Computer Science & Engineering\nEngineering College, Warangal\nWarangal, Telangana, India\nsupervisor.cse@college.edu")
     ]
 
     row_cells = authors_table.rows[0].cells

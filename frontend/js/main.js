@@ -1,10 +1,14 @@
 /**
- * MediSense NLP Healthcare Web Portal & Full-Stack Backend Client
- * Authors: K. Priya & CH. Harshini (B.Tech CSE, Warangal)
+ * MediSense AI — Clinical Studio Client Logic & View Switcher (New Pattern)
+ * Authors: KATAKAM PRIYA (2303A51194) & CH. HARSHINI (2303A51185)
+ * Project Guide: Mr. Rupesh Mishra (Dept. of CSE, Warangal)
  */
 
 const IS_FILE_PROTOCOL = window.location.protocol === "file:";
 const API_BASE = IS_FILE_PROTOCOL ? "http://127.0.0.1:5000" : "";
+
+let CURRENT_VIEW = "overview";
+let CACHED_FEED_DATA = [];
 
 document.addEventListener("DOMContentLoaded", () => {
     initProtocolNotice();
@@ -15,17 +19,68 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ============================================================
-// 0. PROTOCOL & OFFLINE HELPER BANNER
+// 0. VIEW SWITCHER (SPA PATTERN)
 // ============================================================
+const VIEW_TITLES = {
+    overview: "Overview Dashboard",
+    feedback: "Patient Feedback NLP Studio",
+    database: "SQLite Live Quality Console",
+    analytics: "100,000 Healthcare Benchmarks",
+    simplifier: "Telugu Diagnostic Lab Simplifier",
+    ehr: "Patient EHR Archive",
+    consultation: "OPD Consultation Booking Desk",
+    team: "Capstone Team & Academic Guide"
+};
+
+function switchView(viewName) {
+    if (!VIEW_TITLES[viewName]) return;
+    CURRENT_VIEW = viewName;
+
+    // 1. Hide all panels, show active panel
+    document.querySelectorAll(".view-panel").forEach(panel => {
+        panel.classList.remove("active");
+    });
+    const targetPanel = document.getElementById(`view-${viewName}`);
+    if (targetPanel) targetPanel.classList.add("active");
+
+    // 2. Update active sidebar item
+    document.querySelectorAll(".sidebar-item").forEach(item => {
+        item.classList.remove("active");
+    });
+    const targetNav = document.getElementById(`nav-${viewName}`);
+    if (targetNav) targetNav.classList.add("active");
+
+    // 3. Update breadcrumbs
+    const breadcrumb = document.getElementById("breadcrumbTitle");
+    if (breadcrumb) breadcrumb.innerText = VIEW_TITLES[viewName];
+
+    // 4. Scroll workspace to top
+    const scrollArea = document.querySelector(".workspace-scroll-area");
+    if (scrollArea) scrollArea.scrollTop = 0;
+
+    // 5. Close mobile sidebar if open
+    const sidebar = document.getElementById("appSidebar");
+    if (sidebar && sidebar.classList.contains("open")) {
+        sidebar.classList.remove("open");
+    }
+
+    // Refresh charts if entering analytics or overview
+    if (viewName === "analytics" || viewName === "overview") {
+        setTimeout(initHospitalCharts, 100);
+    }
+}
+
+function toggleSidebar() {
+    const sidebar = document.getElementById("appSidebar");
+    if (sidebar) sidebar.classList.toggle("open");
+}
+
 function initProtocolNotice() {
     if (IS_FILE_PROTOCOL) {
-        const header = document.querySelector(".navbar");
-        if (header) {
-            const banner = document.createElement("div");
-            banner.id = "fileProtocolBanner";
-            banner.style.cssText = "background: #fef3c7; color: #92400e; padding: 6px 16px; font-size: 12px; text-align: center; border-bottom: 1px solid #fde68a; font-weight: 500;";
-            banner.innerHTML = `<i class="fa-solid fa-circle-info"></i> Opened from local folder. Connecting to local server at <code>http://127.0.0.1:5000</code>. To ensure SQLite Database backend is running, double-click <strong>run_website.bat</strong>.`;
-            header.parentNode.insertBefore(banner, header);
+        const header = document.querySelector(".app-header");
+        if (header && !document.getElementById("fileProtocolBanner")) {
+            const badge = document.getElementById("backendStatusText");
+            if (badge) badge.innerText = "SQLite: Local File (Start START_WEBSITE.bat)";
         }
     }
 }
@@ -34,8 +89,8 @@ function initProtocolNotice() {
 // 1. PRESET LOADERS
 // ============================================================
 const FEEDBACK_PRESETS = {
-    1: "The doctor was extremely helpful and polite, but the registration waiting time was more than 90 minutes and billing was slow.",
-    2: "Staff were polite, but billing information was very confusing and hidden charges were added without clear breakdown at discharge.",
+    1: "The doctor was extremely helpful and polite, but the outpatient registration waiting time was more than 90 minutes and billing counter was slow.",
+    2: "Nursing staff were polite, but billing breakdown was confusing and hidden charges were added without clear explanation at discharge.",
     3: "The hospital was spotless clean and the nursing team was supportive, caring, and professional throughout our stay.",
     4: "The emergency room was disorganized and staff were rude. My father had severe pain and no doctor was available for an hour!"
 };
@@ -43,7 +98,7 @@ const FEEDBACK_PRESETS = {
 const REPORT_PRESETS = {
     1: "PATIENT CLINICAL DIAGNOSTIC REPORT\nSerum lipid profile reveals marked hypercholesterolemia with Total Cholesterol: 245 mg/dL, elevated low-density lipoprotein (LDL: 165 mg/dL) and Triglycerides: 215 mg/dL. Concomitant Fasting Blood Sugar: 142 mg/dL and HbA1c: 7.8% is suggestive of uncontrolled diabetes mellitus. Serum Creatinine: 1.0 mg/dL is within normal limits.",
     2: "HEMATOLOGY LABORATORY INVESTIGATION\nComplete Blood Count reveals acute thrombocytopenia with Platelet Count: 0.65 lakhs/mcL (normal 1.5 - 4.5). WBC: 3400 cells/mcL showing mild leukopenia. Hemoglobin: 13.2 g/dL. Patient presents with acute febrile illness consistent with suspected Dengue viral infection.",
-    3: "HEPATIC FUNCTION PANEL\nElevated liver transaminases detected. SGOT: 88 U/L and SGPT: 112 U/L indicating hepatocellular stress. Total Cholesterol: 185 mg/dL. Fasting Blood Sugar: 94 mg/dL.",
+    3: "HEPATIC FUNCTION PANEL\nElevated liver transaminases detected. SGOT: 88 U/L and SGPT: 112 U/L indicating hepatocellular stress. Total Cholesterol: 185 mg/dL. Fasting Blood Sugar: 94 mg/dL. Normal renal function observed.",
     4: "EXECUTIVE HEALTH CHECKUP LAB REPORT\nTotal Cholesterol: 168 mg/dL, LDL: 88 mg/dL, Triglycerides: 110 mg/dL. Fasting Blood Sugar: 86 mg/dL, HbA1c: 5.2%. Hemoglobin: 14.5 g/dL. All physiological parameters within reference range."
 };
 
@@ -51,6 +106,11 @@ function loadFeedbackPreset(id) {
     const text = FEEDBACK_PRESETS[id];
     if (text) {
         document.getElementById("feedbackText").value = text;
+        const chips = document.querySelectorAll("#view-feedback .action-chip");
+        chips.forEach((c, idx) => {
+            c.classList.toggle("active", idx === (id - 1));
+        });
+        showToast(`Loaded Feedback Preset ${id}`, "info");
     }
 }
 
@@ -58,11 +118,16 @@ function loadReportPreset(id) {
     const text = REPORT_PRESETS[id];
     if (text) {
         document.getElementById("reportText").value = text;
+        const chips = document.querySelectorAll("#view-simplifier .action-chip");
+        chips.forEach((c, idx) => {
+            c.classList.toggle("active", idx === (id - 1));
+        });
+        showToast(`Loaded Diagnostic Case Preset ${id}`, "info");
     }
 }
 
 // ============================================================
-// 2. TOAST NOTIFICATIONS
+// 2. TOAST NOTIFICATIONS & CLIPBOARD
 // ============================================================
 function showToast(message, type = "success") {
     const container = document.getElementById("toastContainer");
@@ -74,6 +139,7 @@ function showToast(message, type = "success") {
     let icon = "fa-circle-check text-success";
     if (type === "error") icon = "fa-circle-exclamation text-danger";
     if (type === "info") icon = "fa-circle-info text-primary";
+    if (type === "warning") icon = "fa-triangle-exclamation text-warning";
 
     toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
     container.appendChild(toast);
@@ -83,7 +149,19 @@ function showToast(message, type = "success") {
         toast.style.transform = "translateX(100%)";
         toast.style.transition = "all 0.3s ease";
         setTimeout(() => toast.remove(), 300);
-    }, 3500);
+    }, 3800);
+}
+
+function copyToClipboard(text, label = "ID") {
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast(`Copied ${label}: ${text}`, "success");
+        }).catch(() => {
+            showToast(`Selected ${label}: ${text}`, "info");
+        });
+    } else {
+        showToast(`Selected ${label}: ${text}`, "info");
+    }
 }
 
 // ============================================================
@@ -97,13 +175,14 @@ async function loadBackendHealth() {
 
         const badgeText = document.getElementById("backendStatusText");
         if (badgeText) {
-            badgeText.innerText = `Backend: SQLite Connected (${data.database.total_feedbacks} records)`;
+            badgeText.innerText = `SQLite: Connected (${data.database.total_feedbacks} records)`;
         }
 
+        const sideCount = document.getElementById("sideDbCount");
+        if (sideCount) sideCount.innerText = `${data.database.total_feedbacks}`;
+
         const heroDb = document.getElementById("heroDbRecords");
-        if (heroDb) {
-            heroDb.innerText = `${data.database.total_feedbacks}`;
-        }
+        if (heroDb) heroDb.innerText = `${data.database.total_feedbacks}`;
 
         const totalCount = document.getElementById("dbTotalCount");
         if (totalCount) totalCount.innerText = data.database.total_feedbacks;
@@ -118,13 +197,13 @@ async function loadBackendHealth() {
         console.warn("Backend health check:", err);
         const badgeText = document.getElementById("backendStatusText");
         if (badgeText) {
-            badgeText.innerText = IS_FILE_PROTOCOL ? "Local Mode (Run run_website.bat)" : "Backend Standby";
+            badgeText.innerText = IS_FILE_PROTOCOL ? "Local Standby (Run START_WEBSITE.bat)" : "Backend Standby";
         }
     }
 }
 
 // ============================================================
-// 4. CLIENT-SIDE FALLBACK INFERENCE (IF BACKEND NOT STARTED)
+// 4. CLIENT-SIDE FALLBACK INFERENCE
 // ============================================================
 function runLocalNLPAnalysis(text) {
     const lower = text.toLowerCase();
@@ -139,10 +218,10 @@ function runLocalNLPAnalysis(text) {
     let conf = 85.0;
     if (posHits > negHits) {
         sentiment = "Positive";
-        conf = 92.5;
+        conf = 93.8;
     } else if (negHits > posHits) {
         sentiment = "Negative";
-        conf = 90.0;
+        conf = 91.2;
     }
 
     let issue = "No Major Issue";
@@ -213,11 +292,11 @@ async function runFeedbackAnalysis(saveToDb = false) {
             throw new Error("Backend response error");
         }
     } catch (err) {
-        console.warn("Backend unavailable, falling back to local NLP inference engine:", err);
+        console.warn("Backend unavailable, using local NLP engine:", err);
         data = runLocalNLPAnalysis(text);
         if (saveToDb) {
             data.feedback_id = "LOCAL_" + Math.floor(Math.random() * 100000);
-            showToast("Analyzed with client NLP engine! (Run run_website.bat for SQLite persistence)", "info");
+            showToast("Analyzed with client NLP engine! (Run START_WEBSITE.bat for SQLite persistence)", "info");
         }
     } finally {
         loadingElem.style.display = "none";
@@ -231,7 +310,7 @@ async function runFeedbackAnalysis(saveToDb = false) {
     const dbText = document.getElementById("dbSavedText");
     if (saveToDb && data.feedback_id) {
         dbNotice.style.display = "flex";
-        dbText.innerHTML = `<strong>Persisted Record!</strong> Assigned Record ID: <code>${data.feedback_id}</code> (${hospitalName})`;
+        dbText.innerHTML = `<strong>Persisted Record!</strong> Ticket ID: <code onclick="copyToClipboard('${data.feedback_id}', 'Ticket ID')" style="cursor:pointer;">${data.feedback_id} <i class="fa-regular fa-copy"></i></code> (${hospitalName})`;
         if (!data.feedback_id.startsWith("LOCAL_")) {
             showToast(`Feedback saved to SQLite database as ${data.feedback_id}!`, "success");
             loadDatabaseFeed();
@@ -268,7 +347,7 @@ async function runFeedbackAnalysis(saveToDb = false) {
     tokensContainer.innerHTML = "";
     (data.tokens || []).forEach(tok => {
         const span = document.createElement("span");
-        span.className = "token";
+        span.className = "token-chip";
         span.innerText = tok;
         tokensContainer.appendChild(span);
     });
@@ -284,17 +363,17 @@ async function runFeedbackAnalysis(saveToDb = false) {
     const alertText = document.getElementById("adminActionText");
     
     if (data.urgency_level === "High") {
-        alertElem.className = "alert alert-danger";
-        alertText.innerHTML = "<strong>🚨 Immediate Action:</strong> Patient relations officer alerted. Verify doctor attendance and review clinical handling.";
+        alertElem.className = "alert-triage pill-danger";
+        alertText.innerHTML = "<strong><i class='fa-solid fa-triangle-exclamation'></i> High Priority Action:</strong> Patient relations officer alerted. Immediate investigation into wait delay and clinical care required.";
     } else if (data.primary_issue === "Billing Transparency") {
-        alertElem.className = "alert alert-warning";
-        alertText.innerHTML = "<strong>⚠️ Notice:</strong> Provide itemized billing breakdown and review counter explanation clarity.";
+        alertElem.className = "alert-triage pill-warning";
+        alertText.innerHTML = "<strong><i class='fa-solid fa-receipt'></i> Administrative Notice:</strong> Provide itemized billing breakdown and review counter explanation clarity.";
     } else if (data.primary_issue === "Long Waiting Time") {
-        alertElem.className = "alert alert-info";
-        alertText.innerHTML = "<strong>ℹ️ Suggestion:</strong> Digital queue optimization recommended to balance outpatient consultation intervals.";
+        alertElem.className = "alert-triage pill-info";
+        alertText.innerHTML = "<strong><i class='fa-solid fa-clock'></i> Operational Recommendation:</strong> Digital queue optimization recommended to balance outpatient consultation intervals.";
     } else {
-        alertElem.className = "alert alert-success";
-        alertText.innerHTML = "<strong>✅ Satisfactory Service:</strong> Feedback archived for departmental quality index benchmarking.";
+        alertElem.className = "alert-triage pill-success";
+        alertText.innerHTML = "<strong><i class='fa-solid fa-circle-check'></i> Satisfactory Service:</strong> Positive patient review recorded and attributed to departmental SQI benchmarking.";
     }
 }
 
@@ -316,91 +395,100 @@ async function loadDatabaseFeed() {
             sentiment: sent,
             urgency: urg,
             status: stat,
-            limit: 30
+            limit: 40
         });
 
         const response = await fetch(`${API_BASE}/api/feedbacks?${queryParams.toString()}`);
         if (!response.ok) throw new Error("Could not fetch database records");
         const data = await response.json();
 
-        tbody.innerHTML = "";
-        if (!data.feedbacks || data.feedbacks.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 24px; color:#64748b;">No feedback records found matching filter criteria.</td></tr>`;
-            return;
-        }
-
-        data.feedbacks.forEach(item => {
-            const tr = document.createElement("tr");
-
-            const sentClass = item.sentiment === "Positive" ? "pill-positive" :
-                              item.sentiment === "Negative" ? "pill-negative" : "pill-neutral";
-            
-            const urgClass = item.urgency_level === "High" ? "pill-danger" :
-                             item.urgency_level === "Medium" ? "pill-warning" : "pill-success";
-
-            const statusClass = item.status === "Resolved" ? "pill-success" :
-                               item.status === "Under Review" ? "pill-warning" : "pill-neutral";
-
-            const actionBtn = item.status !== "Resolved" ? 
-                `<button class="btn-resolve-sm" onclick="updateFeedbackStatus('${item.feedback_id}', 'Resolved')"><i class="fa-solid fa-check"></i> Resolve</button>` :
-                `<span style="color:#15803d; font-size:11px; font-weight:700;"><i class="fa-solid fa-circle-check"></i> Done</span>`;
-
-            tr.innerHTML = `
-                <td><code>${item.feedback_id}</code></td>
-                <td>
-                    <strong>${item.patient_name}</strong><br>
-                    <small style="color:#64748b;">${item.hospital_name} (${item.department})</small>
-                </td>
-                <td style="max-width:280px; font-size:12.5px;">${item.feedback_text}</td>
-                <td><span class="pill ${sentClass}">${item.sentiment}</span></td>
-                <td style="font-size:12px;">${item.primary_issue}</td>
-                <td><span class="pill ${urgClass}">${item.urgency_level}</span></td>
-                <td><strong>${item.sqi_score}</strong></td>
-                <td><span class="pill ${statusClass}">${item.status}</span></td>
-                <td>
-                    <div style="display:flex; gap:6px; align-items:center;">
-                        ${actionBtn}
-                        <button class="btn-danger-sm" onclick="deleteFeedback('${item.feedback_id}')" title="Delete record"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
+        CACHED_FEED_DATA = data.feedbacks || [];
+        renderFeedTable(CACHED_FEED_DATA, tbody);
 
     } catch (err) {
         console.warn("Database feed fallback notice:", err);
-        // Display sample records if opened as file
         renderLocalSampleFeed(tbody);
     }
 }
 
-function renderLocalSampleFeed(tbody) {
-    const samples = [
-        { id: "WFQ2024000001", patient: "Verified Outpatient", hosp: "Rohini Super Speciality Hospital", dept: "Cardiology", text: "Staff were helpful but registration process was slow.", sent: "Neutral", issue: "Long Waiting Time", urg: "Low", sqi: 76.1, status: "Resolved" },
-        { id: "WFQ2024000002", patient: "Verified Outpatient", hosp: "Sri Sai Multispeciality Hospital", dept: "General Medicine", text: "Staff were polite and explained process clearly.", sent: "Positive", issue: "No Major Issue", urg: "Low", sqi: 78.7, status: "Resolved" },
-        { id: "WFQ2024000003", patient: "Verified Outpatient", hosp: "MGM Hospital Warangal", dept: "Emergency Care", text: "Doctor consultation delayed by 90 minutes. Emergency ward crowded.", sent: "Negative", issue: "Long Waiting Time", urg: "High", sqi: 68.4, status: "Under Review" }
-    ];
-
+function renderFeedTable(feedbacks, tbody) {
     tbody.innerHTML = "";
-    samples.forEach(item => {
+    if (!feedbacks || feedbacks.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 28px; color:#64748b;">No feedback records found matching filter criteria.</td></tr>`;
+        return;
+    }
+
+    feedbacks.forEach(item => {
         const tr = document.createElement("tr");
-        const sentClass = item.sent === "Positive" ? "pill-positive" : item.sent === "Negative" ? "pill-negative" : "pill-neutral";
-        const urgClass = item.urg === "High" ? "pill-danger" : item.urg === "Medium" ? "pill-warning" : "pill-success";
-        const statusClass = item.status === "Resolved" ? "pill-success" : "pill-warning";
+
+        const sentClass = item.sentiment === "Positive" ? "pill-positive" :
+                          item.sentiment === "Negative" ? "pill-negative" : "pill-neutral";
+        
+        const urgClass = item.urgency_level === "High" ? "pill-danger" :
+                         item.urgency_level === "Medium" ? "pill-warning" : "pill-success";
+
+        const statusClass = item.status === "Resolved" ? "pill-success" :
+                           item.status === "Under Review" ? "pill-warning" : "pill-neutral";
+
+        const actionBtn = item.status !== "Resolved" ? 
+            `<button class="btn-resolve-sm" onclick="updateFeedbackStatus('${item.feedback_id}', 'Resolved')"><i class="fa-solid fa-check"></i> Resolve</button>` :
+            `<span style="color:#15803d; font-size:11px; font-weight:700;"><i class="fa-solid fa-circle-check"></i> Done</span>`;
 
         tr.innerHTML = `
-            <td><code>${item.id}</code></td>
-            <td><strong>${item.patient}</strong><br><small style="color:#64748b;">${item.hosp} (${item.dept})</small></td>
-            <td style="max-width:280px; font-size:12.5px;">${item.text}</td>
-            <td><span class="pill ${sentClass}">${item.sent}</span></td>
-            <td style="font-size:12px;">${item.issue}</td>
-            <td><span class="pill ${urgClass}">${item.urg}</span></td>
-            <td><strong>${item.sqi}</strong></td>
+            <td>
+                <code onclick="copyToClipboard('${item.feedback_id}', 'Feedback ID')" style="cursor:pointer;" title="Click to copy">${item.feedback_id} <i class="fa-regular fa-copy" style="font-size:10px;"></i></code>
+            </td>
+            <td>
+                <strong>${item.patient_name}</strong><br>
+                <small style="color:#64748b;">${item.hospital_name} (${item.department})</small>
+            </td>
+            <td style="max-width:280px; font-size:12.5px;">${item.feedback_text}</td>
+            <td><span class="pill ${sentClass}">${item.sentiment}</span></td>
+            <td style="font-size:12px;">${item.primary_issue}</td>
+            <td><span class="pill ${urgClass}">${item.urgency_level}</span></td>
+            <td><strong>${item.sqi_score}</strong></td>
             <td><span class="pill ${statusClass}">${item.status}</span></td>
-            <td><span style="color:#15803d; font-size:11px; font-weight:700;"><i class="fa-solid fa-circle-check"></i> Sample</span></td>
+            <td>
+                <div style="display:flex; gap:6px; align-items:center;">
+                    ${actionBtn}
+                    <button class="btn-danger-sm" onclick="deleteFeedback('${item.feedback_id}')" title="Delete record"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            </td>
         `;
         tbody.appendChild(tr);
     });
+}
+
+function filterTableRowsLocally() {
+    const searchVal = document.getElementById("filterSearch") ? document.getElementById("filterSearch").value.toLowerCase().trim() : "";
+    const tbody = document.getElementById("dbFeedTableBody");
+    if (!tbody || !CACHED_FEED_DATA) return;
+
+    if (!searchVal) {
+        renderFeedTable(CACHED_FEED_DATA, tbody);
+        return;
+    }
+
+    const filtered = CACHED_FEED_DATA.filter(item => {
+        return (item.feedback_id || "").toLowerCase().includes(searchVal) ||
+               (item.patient_name || "").toLowerCase().includes(searchVal) ||
+               (item.hospital_name || "").toLowerCase().includes(searchVal) ||
+               (item.feedback_text || "").toLowerCase().includes(searchVal) ||
+               (item.primary_issue || "").toLowerCase().includes(searchVal);
+    });
+
+    renderFeedTable(filtered, tbody);
+}
+
+function renderLocalSampleFeed(tbody) {
+    const samples = [
+        { feedback_id: "WFQ2024000001", patient_name: "Verified Outpatient", hospital_name: "Rohini Super Speciality Hospital", department: "Cardiology", feedback_text: "Staff were helpful but registration process was slow.", sentiment: "Neutral", primary_issue: "Long Waiting Time", urgency_level: "Low", sqi_score: 76.1, status: "Resolved" },
+        { feedback_id: "WFQ2024000002", patient_name: "Verified Outpatient", hospital_name: "Sri Sai Multispeciality Hospital", department: "General Medicine", feedback_text: "Staff were polite and explained process clearly.", sentiment: "Positive", primary_issue: "No Major Issue", urgency_level: "Low", sqi_score: 78.7, status: "Resolved" },
+        { feedback_id: "WFQ2024000003", patient_name: "Verified Outpatient", hospital_name: "MGM Hospital Warangal", department: "Emergency Care", feedback_text: "Doctor consultation delayed by 90 minutes. Emergency ward crowded.", sentiment: "Negative", primary_issue: "Long Waiting Time", urgency_level: "High", sqi_score: 68.4, status: "Under Review" }
+    ];
+
+    CACHED_FEED_DATA = samples;
+    renderFeedTable(samples, tbody);
 }
 
 async function updateFeedbackStatus(feedbackId, newStatus) {
@@ -415,7 +503,7 @@ async function updateFeedbackStatus(feedbackId, newStatus) {
         loadDatabaseFeed();
         loadBackendHealth();
     } catch (err) {
-        showToast("Notice: Local mode active. Start run_website.bat for backend updates.", "info");
+        showToast("Notice: Local mode active. Start START_WEBSITE.bat for live updates.", "info");
     }
 }
 
@@ -428,7 +516,7 @@ async function deleteFeedback(feedbackId) {
         loadDatabaseFeed();
         loadBackendHealth();
     } catch (err) {
-        showToast("Notice: Local mode active. Start run_website.bat for backend changes.", "info");
+        showToast("Notice: Local mode active. Start START_WEBSITE.bat for backend changes.", "info");
     }
 }
 
@@ -484,7 +572,7 @@ async function runReportSimplification() {
     const ehrText = document.getElementById("ehrSavedText");
     if (data.report_id) {
         ehrNotice.style.display = "flex";
-        ehrText.innerHTML = `<strong>Archived in EHR Database!</strong> Record ID: <code>${data.report_id}</code> for ${patientName}.`;
+        ehrText.innerHTML = `<strong>Archived in EHR Database!</strong> Record ID: <code onclick="copyToClipboard('${data.report_id}', 'Report ID')" style="cursor:pointer;">${data.report_id} <i class="fa-regular fa-copy"></i></code> for ${patientName}.`;
         showToast(`Clinical report saved to EHR archive (${data.report_id})!`, "success");
         loadSavedReports();
     } else {
@@ -527,6 +615,7 @@ async function runReportSimplification() {
     if (data.audio_url) {
         audioPlayer.src = (IS_FILE_PROTOCOL ? API_BASE : "") + data.audio_url;
         audioPlayer.load();
+        audioPlayer.play().catch(() => {/* auto-play policy */});
     }
 }
 
@@ -540,7 +629,7 @@ function runLocalReportParser(text) {
         const val = parseFloat(cholMatch[2]);
         biomarkers.push({
             parameter: "Total Cholesterol",
-            parameter_te: "మొత్తం కొలెస్ట్రాల్",
+            parameter_te: "మొత్తం కొలెస్ట్రాల్ (Total Cholesterol)",
             value: val,
             unit: "mg/dL",
             normal_range: "125 - 200 mg/dL",
@@ -582,7 +671,7 @@ function runLocalReportParser(text) {
         const val = parseFloat(pltMatch[2]);
         biomarkers.push({
             parameter: "Platelet Count",
-            parameter_te: "ప్లేట్‌లెట్స్",
+            parameter_te: "ప్లేట్‌లెట్స్ (రక్తం గడ్డకట్టే కణాలు)",
             value: val,
             unit: "lakhs/mcL",
             normal_range: "1.5 - 4.5 lakhs/mcL",
@@ -622,7 +711,7 @@ async function loadSavedReports() {
 
         tbody.innerHTML = "";
         if (!data.reports || data.reports.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 20px; color:#64748b;">No saved medical reports in SQLite database yet. Simplify a report to see it saved here!</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 24px; color:#64748b;">No saved medical reports in SQLite database yet. Simplify a report above to automatically save it!</td></tr>`;
             return;
         }
 
@@ -634,11 +723,13 @@ async function loadSavedReports() {
                 `<span style="color:#64748b; font-size:11px;">Audio not generated</span>`;
 
             tr.innerHTML = `
-                <td><code>${rep.report_id}</code></td>
+                <td>
+                    <code onclick="copyToClipboard('${rep.report_id}', 'Report ID')" style="cursor:pointer;" title="Click to copy">${rep.report_id} <i class="fa-regular fa-copy" style="font-size:10px;"></i></code>
+                </td>
                 <td><strong>${rep.patient_name}</strong></td>
                 <td>${rep.hospital_name}</td>
                 <td style="font-size:12px; color:#64748b;">${rep.created_at || 'Just now'}</td>
-                <td><span class="badge badge-success">${countBio} Biomarkers</span></td>
+                <td><span class="pill pill-success">${countBio} Biomarkers</span></td>
                 <td><span style="color:#15803d; font-weight:700;">-${Math.max(0, (rep.original_grade - rep.simplified_grade)).toFixed(1)} Grades</span></td>
                 <td>${audioBtn}</td>
                 <td>
@@ -699,7 +790,7 @@ async function submitConsultation(event) {
         showToast(`Consultation request confirmed (ID: ${res.data.inquiry_id})! Hospital will contact you.`, "success");
         document.getElementById("consultationForm").reset();
     } catch (err) {
-        showToast(`Inquiry noted for ${name}! (Run run_website.bat for SQLite persistence)`, "info");
+        showToast(`Inquiry noted for ${name}! (Run START_WEBSITE.bat for live persistence)`, "info");
         document.getElementById("consultationForm").reset();
     }
 }
@@ -713,19 +804,21 @@ async function initHospitalCharts() {
         if (!response.ok) throw new Error("Stats not available");
         const stats = await response.json();
 
-        // Update KPIs
         if (stats.total_records) {
-            document.getElementById("kpiRecords").innerText = `${stats.total_records.toLocaleString()}`;
-            document.getElementById("kpiWait").innerText = `${stats.mean_waiting_time} min`;
-            document.getElementById("kpiSat").innerText = `${stats.mean_satisfaction} / 100`;
-            document.getElementById("kpiSqi").innerText = `${stats.mean_sqi} / 100`;
+            const kpiRec = document.getElementById("kpiRecords");
+            if (kpiRec) kpiRec.innerText = `${stats.total_records.toLocaleString()}`;
+            const kpiWait = document.getElementById("kpiWait");
+            if (kpiWait) kpiWait.innerText = `${stats.mean_waiting_time} min`;
+            const kpiSat = document.getElementById("kpiSat");
+            if (kpiSat) kpiSat.innerText = `${stats.mean_satisfaction} / 100`;
+            const kpiSqi = document.getElementById("kpiSqi");
+            if (kpiSqi) kpiSqi.innerText = `${stats.mean_sqi} / 100`;
         }
 
         renderCharts(stats);
 
     } catch (err) {
         console.warn("Using offline benchmark stats for charts:", err);
-        // Fallback default benchmark statistics
         const fallbackStats = {
             hospitals: [
                 { hospital_name: "Rohini Super Speciality", avg_satisfaction: 82.5 },
@@ -748,14 +841,45 @@ async function initHospitalCharts() {
     }
 }
 
-function renderCharts(stats) {
-    // 1. Hospital Satisfaction Chart
-    if (stats.hospitals && stats.hospitals.length > 0) {
-        const hospNames = stats.hospitals.map(h => h.hospital_name.replace("Hospital", "").trim());
-        const hospScores = stats.hospitals.map(h => h.avg_satisfaction);
+let CHART_INSTANCES = {};
 
-        const ctx1 = document.getElementById("hospitalSatisfactionChart").getContext("2d");
-        new Chart(ctx1, {
+function renderCharts(stats) {
+    if (!stats.hospitals) return;
+
+    const hospNames = stats.hospitals.map(h => h.hospital_name.replace("Hospital", "").trim());
+    const hospScores = stats.hospitals.map(h => h.avg_satisfaction);
+
+    // 1. Overview satisfaction chart
+    const overviewCanvas = document.getElementById("overviewSatisfactionChart");
+    if (overviewCanvas) {
+        if (CHART_INSTANCES["overview"]) CHART_INSTANCES["overview"].destroy();
+        CHART_INSTANCES["overview"] = new Chart(overviewCanvas.getContext("2d"), {
+            type: "bar",
+            data: {
+                labels: hospNames.slice(0, 6),
+                datasets: [{
+                    label: "SQI Score",
+                    data: hospScores.slice(0, 6),
+                    backgroundColor: "#0284c7",
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { min: 65, max: 90 }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+
+    // 2. Main Analytics Chart
+    const mainCanvas = document.getElementById("hospitalSatisfactionChart");
+    if (mainCanvas) {
+        if (CHART_INSTANCES["main"]) CHART_INSTANCES["main"].destroy();
+        CHART_INSTANCES["main"] = new Chart(mainCanvas.getContext("2d"), {
             type: "bar",
             data: {
                 labels: hospNames,
@@ -777,20 +901,19 @@ function renderCharts(stats) {
                         title: { display: true, text: "Satisfaction Score (0-100)" }
                     }
                 },
-                plugins: {
-                    legend: { display: false }
-                }
+                plugins: { legend: { display: false } }
             }
         });
     }
 
-    // 2. Primary Issues Chart
-    if (stats.issues && stats.issues.length > 0) {
+    // 3. Issues Chart
+    const issuesCanvas = document.getElementById("issuesChart");
+    if (issuesCanvas && stats.issues) {
+        if (CHART_INSTANCES["issues"]) CHART_INSTANCES["issues"].destroy();
         const issueLabels = stats.issues.map(i => i.issue);
         const issueCounts = stats.issues.map(i => i.count);
 
-        const ctx2 = document.getElementById("issuesChart").getContext("2d");
-        new Chart(ctx2, {
+        CHART_INSTANCES["issues"] = new Chart(issuesCanvas.getContext("2d"), {
             type: "doughnut",
             data: {
                 labels: issueLabels,
@@ -804,9 +927,7 @@ function renderCharts(stats) {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: "right" }
-                }
+                plugins: { legend: { position: "right" } }
             }
         });
     }

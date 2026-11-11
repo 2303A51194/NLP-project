@@ -12,7 +12,7 @@ Engineering College, Warangal
 Warangal, Telangana, India  
 harshini.cse@college.edu  
 
-**Faculty Project Guide**  
+**Mr. Rupesh Mishra**  
 *Department of Computer Science and Engineering*  
 Engineering College, Warangal  
 Warangal, Telangana, India  
