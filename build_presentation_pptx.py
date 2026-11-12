@@ -1,5 +1,6 @@
 """
-MediSense NLP - Professional Academic PowerPoint Presentation Generator (16:9 Widescreen).
+NLP-Based Hospital Service Quality Analysis in Warangal
+Professional Academic PowerPoint Presentation Generator (16:9 Widescreen).
 Department of Computer Science & Engineering.
 Authors: KATAKAM PRIYA (2303A51194) & CH. HARSHINI (2303A51185)
 Supervisor: Mr. Rupesh Mishra, Assistant Professor, Dept. of CSE
@@ -40,7 +41,6 @@ def set_slide_background(slide, color=C_WHITE):
     fill.fore_color.rgb = color
 
 def add_header(slide, badge_text, title_text, subtitle_text=""):
-    # Header container
     tb = slide.shapes.add_textbox(Inches(0.8), Inches(0.4), Inches(11.733), Inches(1.2))
     tf = tb.text_frame
     tf.word_wrap = True
@@ -84,24 +84,25 @@ def add_header(slide, badge_text, title_text, subtitle_text=""):
 
 def add_footer(slide, current_slide, total_slides=18):
     # Left: Project Title
-    tb_l = slide.shapes.add_textbox(Inches(0.8), Inches(7.0), Inches(5.0), Inches(0.35))
+    tb_l = slide.shapes.add_textbox(Inches(0.8), Inches(7.0), Inches(5.5), Inches(0.35))
     tf_l = tb_l.text_frame
     tf_l.margin_left = tf_l.margin_top = tf_l.margin_right = tf_l.margin_bottom = 0
     p_l = tf_l.paragraphs[0]
     r_l = p_l.add_run()
-    r_l.text = "MediSense NLP: Hospital Service Quality & Report Simplifier"
+    r_l.text = "NLP-Based Hospital Service Quality Analysis in Warangal"
     r_l.font.name = "Arial"
     r_l.font.size = Pt(8.5)
+    r_l.font.bold = True
     r_l.font.color.rgb = C_SLATE
 
     # Center: College / Dept
-    tb_c = slide.shapes.add_textbox(Inches(5.0), Inches(7.0), Inches(4.5), Inches(0.35))
+    tb_c = slide.shapes.add_textbox(Inches(6.0), Inches(7.0), Inches(4.5), Inches(0.35))
     tf_c = tb_c.text_frame
     tf_c.margin_left = tf_c.margin_top = tf_c.margin_right = tf_c.margin_bottom = 0
     p_c = tf_c.paragraphs[0]
     p_c.alignment = PP_ALIGN.CENTER
     r_c = p_c.add_run()
-    r_c.text = "Department of Computer Science & Engineering | Academic Review"
+    r_c.text = "Dept. of Computer Science & Engineering | Warangal, Telangana"
     r_c.font.name = "Arial"
     r_c.font.size = Pt(8.5)
     r_c.font.color.rgb = C_SLATE
