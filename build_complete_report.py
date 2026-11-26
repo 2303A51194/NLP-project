@@ -1,5 +1,5 @@
 """
-MediSense NLP - Complete University-Level Academic Thesis Generator (DOCX).
+Hospital Quality NLP System - Complete University-Level Academic Thesis Generator (DOCX).
 Target Length: 30-50 pages equivalent academic thesis documentation.
 Department of Computer Science and Engineering.
 Authors: K. Priya (2303A51194) & CH. Harshini (2303A51185)
@@ -39,7 +39,7 @@ def build_docx():
         # Header
         hp = s.header.paragraphs[0]
         hp.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-        hrun = hp.add_run("MediSense NLP: Hospital Service Quality & Report Simplification")
+        hrun = hp.add_run("NLP-Based Hospital Service Quality Analysis in Warangal")
         hrun.font.name = "Times New Roman"
         hrun.font.size = Pt(8.5)
         hrun.font.italic = True
@@ -459,7 +459,7 @@ def build_docx():
     )
 
     add_section_h2(doc, "1.5 Project Objectives")
-    add_body_p(doc, "To resolve these challenges, the MediSense NLP framework establishes five concrete technical objectives:")
+    add_body_p(doc, "To resolve these challenges, the NLP-based hospital service quality analysis framework establishes five concrete technical objectives:")
     add_bullet_p(doc, "Design and train a supervised Natural Language Processing classifier on a curated dataset of 100,000 Warangal hospital feedback reviews to predict patient sentiment with an accuracy exceeding 90%.", bold_prefix="Objective 1: ")
     add_bullet_p(doc, "Implement multi-class operational grievance categorization to identify primary service bottlenecks (Long Waiting Time, Billing Transparency, Staff Behavior, Cleanliness) and compute an institutional Service Quality Index (SQI).", bold_prefix="Objective 2: ")
     add_bullet_p(doc, "Develop a deterministic, regex-guided biomedical entity extraction and report simplification engine that extracts physiological biomarkers with a 0.00% numerical hallucination rate.", bold_prefix="Objective 3: ")
@@ -468,7 +468,7 @@ def build_docx():
 
     add_section_h2(doc, "1.6 Project Scope")
     add_body_p(doc, 
-        "The scope of this project encompasses the design, implementation, and academic verification of the MediSense NLP platform. "
+        "The scope of this project encompasses the design, implementation, and academic verification of the Hospital Quality NLP System platform. "
         "The machine learning models are calibrated against a representative benchmark corpus of 100,000 outpatient records representing 12 leading "
         "hospitals in Warangal across government, private super-speciality, and charitable trusts. The clinical report simplifier targets 13 common, "
         "high-frequency outpatient laboratory panels: Lipid Profile (Total Cholesterol, Triglycerides, HDL, LDL), Glycemic Indices (Fasting Blood Sugar, "
@@ -486,7 +486,7 @@ def build_docx():
         ["Dravidian NLG & TTS", "Synthesized culturally idiomatic Telugu report explanations with Google TTS audio streaming for illiterate demographics."],
         ["Full-Stack Persistence", "Integrated SQLite relational database and Flask REST APIs for automated grievance resolution and EHR archiving."]
     ]
-    add_table_data(doc, ["Dimension", "Specific Scientific & Technical Contribution"], contrib_rows, "1.1", "Primary Contributions of MediSense NLP Framework")
+    add_table_data(doc, ["Dimension", "Specific Scientific & Technical Contribution"], contrib_rows, "1.1", "Primary Contributions of Hospital Quality NLP System Framework")
 
     # ==========================================================================
     # CHAPTER 2: PROBLEM STATEMENT AND EXISTING SYSTEM
@@ -525,7 +525,7 @@ def build_docx():
 
     add_section_h2(doc, "2.4 Proposed System")
     add_body_p(doc, 
-        "To overcome these limitations, we propose MediSense NLP—an end-to-end, dual-engine healthcare natural language processing framework "
+        "To overcome these limitations, we propose Hospital Quality NLP System—an end-to-end, dual-engine healthcare natural language processing framework "
         "integrated with a persistent SQLite database and a responsive full-stack web portal. The system architecture divides into two core operational engines:\n\n"
         "• Engine A (Hospital Service Quality Intelligence): Utilizes regularized TF-IDF classification trained on 100,000 Warangal hospital records to analyze patient sentiment (Positive, Neutral, Negative) and classify primary issues (Billing, Waiting Times, Cleanliness, Staff Behavior). It computes an institutional Service Quality Index (SQI) and automatically routes high-urgency grievances to a persistent database with administrative tracking.\n\n"
         "• Engine B (Diagnostic Report Simplifier & Telugu Voice Synthesizer): Parses complex diagnostic reports using a deterministic regular expression entity extractor, verifies numbers against clinical reference boundaries, rewrites pathology terms into plain English, translates findings into idiomatic Telugu, and generates synthetic voice audio via gTTS."

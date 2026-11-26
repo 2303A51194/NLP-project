@@ -1,5 +1,5 @@
 """
-MediSense NLP - Full Academic Thesis Content (Part 2: Chapters 3 - 6).
+Hospital Quality NLP System - Full Academic Thesis Content (Part 2: Chapters 3 - 6).
 Authors: K. Priya (2303A51194) & CH. Harshini (2303A51185)
 """
 
@@ -75,13 +75,13 @@ def write_chapters_3_to_6(doc):
     )
 
     add_section_h2(doc, "3.4 Comparison of Existing Approaches")
-    add_body_p(doc, "Table 3.1 provides a structured comparative matrix contrasting MediSense NLP with existing academic and industrial approaches.")
+    add_body_p(doc, "Table 3.1 provides a structured comparative matrix contrasting Hospital Quality NLP System with existing academic and industrial approaches.")
     comp_rows = [
         ["Med-Esl (UMLS Rule-Based)", "Single-word synonyms", "None", "English only", "100%", "High (rigid)", "No DB / No UI"],
         ["ClinicalBERT (Alsentzer)", "Pre-trained transformer", "Transformer embeddings", "English only", "92% - 95%", "Moderate (GPU req.)", "Backend only"],
         ["Commercial Generative LLMs", "Unconstrained generation", "Prompts / Zero-shot", "Multilingual", "88% - 94% (Hallucinates)", "Slow (>2 sec)", "API required"],
         ["Generic Google Translate", "NMT word-level", "Statistical / NMT", "Generic Telugu", "Variable", "Fast", "Standalone tool"],
-        ["MediSense NLP (Proposed)", "Template-guided NER + Vernacular", "Sublinear TF-IDF + Logistic Reg.", "English + Colloquial Telugu", "100% Guaranteed", "Real-Time (<15ms)", "Full-Stack Flask+SQLite"]
+        ["Hospital Quality NLP (Proposed)", "Template-guided NER + Vernacular", "Sublinear TF-IDF + Logistic Reg.", "English + Colloquial Telugu", "100% Guaranteed", "Real-Time (<15ms)", "Full-Stack Flask+SQLite"]
     ]
     add_table_data(doc, ["System / Paradigm", "Simplification Mechanism", "Sentiment / Classification", "Language Support", "Biomarker Fidelity", "Latency / Overhead", "Architecture"], comp_rows, "3.1", "Comparative Evaluation of Existing Healthcare NLP Systems")
 
@@ -97,7 +97,7 @@ def write_chapters_3_to_6(doc):
     add_body_p(doc, 
         "The literature review validates the necessity for a deterministic, hybrid Natural Language Processing system that combines statistical "
         "machine learning for administrative feedback intelligence with template-guided, zero-hallucination clinical translation and Telugu voice synthesis. "
-        "MediSense NLP addresses every identified research gap within a cohesive, full-stack architectural paradigm."
+        "Our NLP framework addresses every identified research gap within a cohesive, full-stack architectural paradigm."
     )
 
     # ==========================================================================
@@ -106,7 +106,7 @@ def write_chapters_3_to_6(doc):
     add_chapter_header(doc, "4", "System Requirements")
 
     add_section_h2(doc, "4.1 Hardware Requirements")
-    add_body_p(doc, "The minimum and recommended hardware configurations required to train, deploy, and host the MediSense NLP platform are detailed in Table 4.1.")
+    add_body_p(doc, "The minimum and recommended hardware configurations required to train, deploy, and host the Hospital Quality NLP System platform are detailed in Table 4.1.")
     hw_rows = [
         ["Processor (CPU)", "Intel Core i3 / AMD Ryzen 3 (Dual-Core)", "Intel Core i5 / AMD Ryzen 5 or higher (Quad-Core)"],
         ["System Memory (RAM)", "4 GB DDR4", "8 GB DDR4 / DDR5 or higher"],
@@ -183,11 +183,11 @@ def write_chapters_3_to_6(doc):
 
     add_section_h2(doc, "5.1 Overall System Architecture")
     add_body_p(doc, 
-        "The MediSense NLP platform is engineered according to a clean Three-Tier Architectural Design Pattern comprising the Presentation Tier "
+        "The hospital service quality NLP platform is engineered according to a clean Three-Tier Architectural Design Pattern comprising the Presentation Tier "
         "(Frontend), Application & Intelligence Tier (Flask REST API Controller and Dual NLP Engines), and the Data Persistence Tier (SQLite Database "
         "and Serialized Machine Learning Models). Figure 5.1 illustrates the structural architecture."
     )
-    add_fig(doc, "System_Architecture.png", "5.1", "MediSense NLP Three-Tier System Architecture")
+    add_fig(doc, "System_Architecture.png", "5.1", "Hospital Quality NLP Three-Tier System Architecture")
 
     add_section_h2(doc, "5.2 Architecture Explanation")
     add_body_p(doc, 

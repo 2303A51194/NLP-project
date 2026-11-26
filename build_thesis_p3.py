@@ -1,5 +1,5 @@
 """
-MediSense NLP - Full Academic Thesis Content (Part 3: Chapters 7 - 11).
+Hospital Quality NLP System - Full Academic Thesis Content (Part 3: Chapters 7 - 11).
 Authors: K. Priya (2303A51194) & CH. Harshini (2303A51185)
 """
 
@@ -196,7 +196,7 @@ def submit_feedback():
 
     add_section_h2(doc, "7.8 Authentication, Security & Privacy")
     add_body_p(doc, 
-        "Because healthcare applications handle sensitive patient data, MediSense NLP implements key security safeguards:\n"
+        "Because healthcare applications handle sensitive patient data, the platform implements key security safeguards:\n"
         "• De-Identification: Patient phone numbers and identity strings are scrubbed prior to model inference.\n"
         "• SQL Injection Prevention: All database queries utilize parameterized SQLite bindings (`?` placeholders), preventing SQL injection attacks.\n"
         "• CORS Protocol Whitelisting: Flask headers explicitly restrict allowable methods (GET, POST, PATCH, DELETE, OPTIONS) and permit safe communication from local origins."
@@ -309,10 +309,10 @@ def submit_feedback():
 
     add_section_h2(doc, "8.8 Web Application User Interface Walkthrough")
     add_body_p(doc, 
-        "Figure 8.4 displays the responsive web interface of MediSense NLP. The portal features clean clinical presets, a real-time feedback NLP preview, "
+        "Figure 8.4 displays the responsive web interface of the hospital service quality analysis system. The portal features clean clinical presets, a real-time feedback NLP preview, "
         "a live SQLite database feed table with status update capabilities, interactive Chart.js analytics, and an integrated audio player."
     )
-    add_fig(doc, "Web_Portal_Interface.png", "8.4", "MediSense NLP Responsive Web Application Interface")
+    add_fig(doc, "Web_Portal_Interface.png", "8.4", "Hospital Quality Analytics Responsive Web Application Interface")
 
     # ==========================================================================
     # CHAPTER 9: TESTING
@@ -322,7 +322,7 @@ def submit_feedback():
     add_section_h2(doc, "9.1 Testing Introduction & Objectives")
     add_body_p(doc, 
         "Software testing is an indispensable phase of software engineering aimed at verifying that the implemented system satisfies all functional "
-        "and non-functional requirements. For MediSense NLP, testing spanned four formal levels: Unit Testing, Integration Testing, Functional Testing, "
+        "and non-functional requirements. For this platform, testing spanned four formal levels: Unit Testing, Integration Testing, Functional Testing, "
         "and System Performance Testing. The objective was to ensure zero model crashes, 100% numerical accuracy, and flawless REST API communication."
     )
 
@@ -379,7 +379,7 @@ def submit_feedback():
 
     add_section_h2(doc, "9.7 Testing Results & Quality Assurance Summary")
     add_body_p(doc, 
-        "All 20 test cases achieved a 100% pass rate. The testing regime confirmed that MediSense NLP is technically sound, robust against edge cases, "
+        "All 20 test cases achieved a 100% pass rate. The testing regime confirmed that the hospital service quality analysis system is technically sound, robust against edge cases, "
         "deterministic in clinical entity extraction, and ready for university academic submission and practical healthcare evaluation."
     )
 
@@ -390,7 +390,7 @@ def submit_feedback():
 
     add_section_h2(doc, "10.1 Conclusion")
     add_body_p(doc, 
-        "This project successfully engineered and validated MediSense NLP, a dual-engine healthcare Natural Language Processing framework and full-stack "
+        "This project successfully engineered and validated our NLP framework, a comprehensive healthcare healthcare Natural Language Processing framework and full-stack "
         "web application tailored for regional Indian hospital ecosystems. By pairing statistical machine learning on 100,000 Warangal hospital reviews "
         "with a deterministic clinical report simplifier and Telugu voice synthesizer, the platform concurrently resolves administrative quality-of-care "
         "deficits and patient comprehension barriers. The system delivers 93.8% sentiment classification accuracy, cuts diagnostic report readability "
@@ -436,7 +436,7 @@ def submit_feedback():
         "[12] J. Devlin, M. W. Chang, K. Lee, and K. Toutanova, 'BERT: Pre-training of deep bidirectional transformers for language understanding,' in Proc. NAACL-HLT, pp. 4171–4186, 2019.",
         "[13] R. F. Bales, Interaction Process Analysis: A Method for the Study of Small Groups. Reading, MA: Addison-Wesley, 1950.",
         "[14] M. E. Roberts et al., 'Structural topic models for open-ended survey responses,' American Journal of Political Science, vol. 58, no. 4, pp. 1064–1082, 2014.",
-        "[15] K. Priya and CH. Harshini, 'MediSense NLP: Hospital Service Quality & Report Simplification in Warangal Healthcare,' B.Tech Project Documentation, Dept. of Computer Science & Engineering, Warangal, 2026."
+        "[15] K. Priya and CH. Harshini, 'NLP-Based Hospital Service Quality Analysis in Warangal in Warangal Healthcare,' B.Tech Project Documentation, Dept. of Computer Science & Engineering, Warangal, 2026."
     ]
 
     for ref in references:
